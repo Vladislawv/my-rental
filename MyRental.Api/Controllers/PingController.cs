@@ -14,7 +14,7 @@ public class PingController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> Ping()
+    public Task<IActionResult> PingAsync()
     {
         return Task.FromResult<IActionResult>(Ok());
     }
