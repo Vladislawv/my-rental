@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using System.Runtime.Serialization;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Diagnostics;
 using MyRental.Api.Dto;
 
@@ -24,27 +22,26 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            await HandleExceptionAsync(context, e.Message, HttpStatusCode.InternalServerError);
+            await HandleExceptionAsync(ex, context);
         }
     }
 
-    private async Task HandleExceptionAsync(HttpContext context, string exMsg, HttpStatusCode httpStatusCode)
+    private async Task HandleExceptionAsync(Exception ex, HttpContext context)
     {
-        _logger.LogError(exMsg);
-
-        HttpResponse response = context.Response;
+        _logger.LogError(ex.Message);
+        var response = context.Response;
         
         response.ContentType = "application/json";
-        response.StatusCode = (int) httpStatusCode;
+        response.StatusCode = (int) HttpStatusCode.InternalServerError;
 
         ErrorDto errorDto = new()
         {
-            ErrorMessage = exMsg
+            ErrorMessage = ex.Message
         };
 
-        string result = JsonSerializer.Serialize(errorDto, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        var result = JsonSerializer.Serialize(errorDto, new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
         await response.WriteAsync(result);
     }

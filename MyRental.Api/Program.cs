@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Diagnostics;
 using MyRental.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
