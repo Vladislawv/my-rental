@@ -1,8 +1,11 @@
-﻿namespace MyRental.Infrastructure.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+using MyRental.Infrastructure.Enums;
 
-public enum Role
+namespace MyRental.Infrastructure.Entities;
+
+public class Role : IdentityRole<int>, IEntity
 {
-    Admin,
-    Realtor,
-    Tenant
+    public RoleType Type { get; set; }
+
+    public virtual ICollection<User> Users { get; set; }
 }

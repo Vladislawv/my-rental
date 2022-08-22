@@ -1,7 +1,8 @@
-﻿namespace MyRental.Infrastructure.Entities;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User
+namespace MyRental.Infrastructure.Entities;
+
+public class User : IdentityUser<int>, IEntity
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+   public virtual ICollection<Role> Roles { get; set; }
 }
