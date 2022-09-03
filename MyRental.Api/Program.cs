@@ -6,6 +6,7 @@ using MyRental.Api.Middlewares;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
+using MyRental.Services.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,9 @@ builder.Services.AddIdentity<User, Role>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddAutoMapper(typeof(TestProfile));
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
