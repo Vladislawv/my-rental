@@ -1,6 +1,9 @@
 ﻿using System.Net.Mime;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using MyRental.Infrastructure;
+using MyRental.Infrastructure.Entities;
+using MyRental.Services;
+using MyRental.Services.Areas.Users.Dto;
 
 namespace MyRental.Api.Controllers;
 
@@ -8,75 +11,108 @@ namespace MyRental.Api.Controllers;
 /// User controller with CRUD operations of User entity
 /// </summary>
 [ApiController]
+[Route("api/users")]
 [Produces(MediaTypeNames.Application.Json)]
 public class UserController : ControllerBase
 {
-    private readonly MyRentalContext _context;
+    private readonly IUserService _userService;
 
     /// <summary>
-    /// Constructor of User controller that requires DbContext
+    /// Constructor
     /// </summary>
-    /// <param name="context"></param>
-    public UserController(MyRentalContext context)
+    /// <param name="userService"></param>
+    public UserController(IUserService userService)
     {
-        _context = context;
+        _userService = userService;
     }
 
+    
     /// <summary>
-    /// Returns all users
+    /// Get List of Users
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Route("/api/users")]
-    public Task<IActionResult> GetAllUsersAsync()
+    [ProducesResponseType(typeof(IList<User>),StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetListAsync()
     {
-        return null;
+        var userDtoList = await _userService.GetListAsync();
+
+        var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDtoInput, User>());
+        var mapper = config.CreateMapper();
+
+        var users = userDtoList.Select(userDto => mapper.Map<User>(userDto)).ToList();
+        
+        return Ok(users);
     }
 
     /// <summary>
-    /// Returns user by id
+    /// Get User by Id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet]
-    [Route("/api/users/{id}")]
-    public Task<IActionResult> GetUserByIdAsync(string id)
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByIdAsync([FromRoute] string id)
     {
-        return null;
+        var userDto = await _userService.GetByIdAsync(id);
+
+        var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDtoInput, User>());
+        var mapper = config.CreateMapper();
+
+        var user = mapper.Map<User>(userDto);
+        
+        return Ok(user);
     }
 
     /// <summary>
-    /// Create new user
+    /// Create new User
     /// </summary>
+    /// <param name="userInput"></param>
     /// <returns></returns>
     [HttpPost]
-    [Route("/api/users")]
-    public Task<IActionResult> CreateUserAsync()
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateAsync([FromBody] User userInput)
     {
-        return null;
+        var userDto = await _userService.CreateAsync(userInput);
+
+        var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDtoInput, User>());
+        var mapper = config.CreateMapper();
+
+        var user = mapper.Map<User>(userDto);
+
+        return Ok(user);
     }
 
     /// <summary>
-    /// Updates user by id
+    /// Update User by Id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPut]
-    [Route("/api/users/{id}")]
-    public Task<IActionResult> UpdateUserAsync(string id)
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateAsync([FromRoute] string id)
     {
-        return null;
+        var userDto = await _userService.UpdateAsync(id);
+
+        var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDtoInput, User>());
+        var mapper = config.CreateMapper();
+
+        var user = mapper.Map<User>(userDto);
+        
+        return Ok(user);
     }
 
     /// <summary>
-    /// Delete user by id
+    /// Delete User by Id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpDelete]
-    [Route("/api/users/{id}")]
-    public Task<IActionResult> DeleteUserAsync(string id)
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteAsync([FromRoute] string id)
     {
-        return null;
+        await _userService.DeleteAsync(id);
+
+        return Ok();
     }
 }

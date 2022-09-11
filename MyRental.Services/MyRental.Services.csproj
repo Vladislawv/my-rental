@@ -10,4 +10,12 @@
       <ProjectReference Include="..\MyRental.Infrastructure\MyRental.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="11.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Areas\Users" />
+    </ItemGroup>
+
 </Project>
