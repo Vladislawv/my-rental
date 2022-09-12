@@ -1,14 +1,12 @@
 ﻿using System.Net.Mime;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using MyRental.Infrastructure.Entities;
 using MyRental.Services;
 using MyRental.Services.Areas.Users.Dto;
 
 namespace MyRental.Api.Controllers;
 
 /// <summary>
-/// User controller with CRUD operations of User entity
+/// Controller to manage User data
 /// </summary>
 [ApiController]
 [Route("api/users")]
@@ -25,24 +23,18 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
-
     
     /// <summary>
     /// Get List of Users
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [ProducesResponseType(typeof(IList<User>),StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetListAsync()
+    [ProducesResponseType(typeof(IList<UserDto>), StatusCodes.Status200OK)]
+    public async Task<IList<UserDto>> GetListAsync()
     {
-        var userDtoList = await _userService.GetListAsync();
+        var users = await _userService.GetListAsync();
 
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDtoInput, User>());
-        var mapper = config.CreateMapper();
-
-        var users = userDtoList.Select(userDto => mapper.Map<User>(userDto)).ToList();
-        
-        return Ok(users);
+        return users;
     }
 
     /// <summary>
@@ -51,15 +43,10 @@ public class UserController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByIdAsync([FromRoute] string id)
     {
-        var userDto = await _userService.GetByIdAsync(id);
-
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDtoInput, User>());
-        var mapper = config.CreateMapper();
-
-        var user = mapper.Map<User>(userDto);
+        var user = await _userService.GetByIdAsync(id);
         
         return Ok(user);
     }
@@ -67,37 +54,28 @@ public class UserController : ControllerBase
     /// <summary>
     /// Create new User
     /// </summary>
-    /// <param name="userInput"></param>
+    /// <param name="userDtoInput"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateAsync([FromBody] User userInput)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateAsync([FromBody] UserDtoInput userDtoInput)
     {
-        var userDto = await _userService.CreateAsync(userInput);
+        await _userService.CreateAsync(userDtoInput);
 
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDtoInput, User>());
-        var mapper = config.CreateMapper();
-
-        var user = mapper.Map<User>(userDto);
-
-        return Ok(user);
+        return Ok();
     }
 
     /// <summary>
-    /// Update User by Id
+    /// Update User
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="userDtoInput"></param>
     /// <returns></returns>
     [HttpPut("{id}")]
-    [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateAsync([FromRoute] string id)
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateAsync([FromRoute] string id, [FromBody] UserDtoInput userDtoInput)
     {
-        var userDto = await _userService.UpdateAsync(id);
-
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDtoInput, User>());
-        var mapper = config.CreateMapper();
-
-        var user = mapper.Map<User>(userDto);
+        var user = await _userService.UpdateAsync(id, userDtoInput);
         
         return Ok(user);
     }
@@ -109,9 +87,9 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteAsync([FromRoute] string id)
+    public async Task<IActionResult> DeleteByIdAsync([FromRoute] string id)
     {
-        await _userService.DeleteAsync(id);
+        await _userService.DeleteByIdAsync(id);
 
         return Ok();
     }

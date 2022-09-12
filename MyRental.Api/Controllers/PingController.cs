@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MyRental.Api.Controllers;
 
 /// <summary>
-/// Test Controller
+/// Ping Controller
 /// </summary>
 [ApiController]
 [Route("api/ping")]
@@ -12,12 +12,12 @@ namespace MyRental.Api.Controllers;
 public class PingController : ControllerBase
 {
     /// <summary>
-    /// Ping method with empty body
+    /// Ping endpoint with empty body
     /// </summary>
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> Ping()
+    public Task<IActionResult> PingAsync()
     {
         return Task.FromResult<IActionResult>(Ok());
     }

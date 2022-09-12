@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Users.Dto;
 
@@ -8,64 +10,59 @@ namespace MyRental.Services;
 public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
+    private readonly IMapper _mapper;
 
-    public UserService(UserManager<User> userManager)
+    public UserService(UserManager<User> userManager, IMapper mapper)
     {
         _userManager = userManager;
+        _mapper = mapper;
     }
 
-    public Task<List<UserDto>> GetListAsync()
+    public async Task<IList<UserDto>> GetListAsync()
     {
-        var users = _userManager.Users.ToList();
-
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDto>());
-        var mapper = config.CreateMapper();
-
-        var userDtoList = users.Select(user => mapper.Map<UserDto>(user)).ToList();
-
-        return Task.FromResult(userDtoList);
+        return await _userManager.Users
+            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+            .ToListAsync();
     }
 
     public async Task<UserDto> GetByIdAsync(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
 
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDto>());
-        var mapper = config.CreateMapper();
+        if (user == null) throw new Exception($"User with Id:{id} is not found.");
 
-        var userDto = mapper.Map<UserDto>(user);
-
-        return userDto;
+        return _mapper.Map<UserDto>(user);
     }
 
-    public async Task<UserDto> CreateAsync(User user)
+    public async Task CreateAsync(UserDtoInput userDtoInput)
     {
+        var user = _mapper.Map<User>(userDtoInput);
+
+        if (user == null) throw new Exception("User must not be null.");
+
         await _userManager.CreateAsync(user);
-
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDto>());
-        var mapper = config.CreateMapper();
-
-        var userDto = mapper.Map<UserDto>(user);
-
-        return userDto;
     }
 
-    public async Task<UserDto> UpdateAsync(string id)
+    public async Task<UserDto> UpdateAsync(string id, UserDtoInput userDtoInput)
     {
         var user = await _userManager.FindByIdAsync(id);
-        await _userManager.UpdateAsync(user);
+        
+        if (user == null) throw new Exception($"User with Id:{id} is not found.");
 
-        var config = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDto>());
-        var mapper = config.CreateMapper();
+        _mapper.Map(userDtoInput, user);
+        
+        var result =  await _userManager.UpdateAsync(user);
 
-        var userDto = mapper.Map<UserDto>(user);
-
-        return userDto;
+        if (!result.Succeeded) throw new Exception("An error occured while updating user");
+        
+        return _mapper.Map<UserDto>(user);
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task DeleteByIdAsync(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
+
+        if (user == null) throw new Exception($"User with Id:{id} is not found.");
 
         await _userManager.DeleteAsync(user);
     }

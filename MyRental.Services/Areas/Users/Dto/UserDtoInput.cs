@@ -1,6 +1,6 @@
 ﻿namespace MyRental.Services.Areas.Users.Dto;
 
-public class UserDtoInput : EntityDto
+public class UserDtoInput
 {
     public string UserName { get; set; }
     public string Email { get; set; }

@@ -6,7 +6,7 @@ using MyRental.Api.Middlewares;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
-using MyRental.Services.Profiles;
+using MyRental.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
