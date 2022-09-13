@@ -42,9 +42,9 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetByIdAsync([FromRoute] string id)
+    public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
     {
         var user = await _userService.GetByIdAsync(id);
         
@@ -71,9 +71,9 @@ public class UserController : ControllerBase
     /// <param name="id"></param>
     /// <param name="userDtoInput"></param>
     /// <returns></returns>
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateAsync([FromRoute] string id, [FromBody] UserDtoInput userDtoInput)
+    public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] UserDtoInput userDtoInput)
     {
         var user = await _userService.UpdateAsync(id, userDtoInput);
         
@@ -85,9 +85,9 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteByIdAsync([FromRoute] string id)
+    public async Task<IActionResult> DeleteByIdAsync([FromRoute] int id)
     {
         await _userService.DeleteByIdAsync(id);
 

@@ -5,8 +5,8 @@ namespace MyRental.Services;
 public interface IUserService
 {
     public Task<IList<UserDto>> GetListAsync();
-    public Task<UserDto> GetByIdAsync(string id);
+    public Task<UserDto> GetByIdAsync(int id);
     public Task CreateAsync(UserDtoInput user);
-    public Task<UserDto> UpdateAsync(string id, UserDtoInput userDtoInput);
-    public Task DeleteByIdAsync(string id);
+    public Task<UserDto> UpdateAsync(int id, UserDtoInput userDtoInput);
+    public Task DeleteByIdAsync(int id);
 }

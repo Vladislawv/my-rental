@@ -25,9 +25,10 @@ public class UserService : IUserService
             .ToListAsync();
     }
 
-    public async Task<UserDto> GetByIdAsync(string id)
+    public async Task<UserDto> GetByIdAsync(int id)
     {
-        var user = await _userManager.FindByIdAsync(id);
+        var user = await _userManager.Users
+            .FirstOrDefaultAsync(user => user.Id == id);
 
         if (user == null) throw new Exception($"User with Id:{id} is not found.");
 
@@ -43,9 +44,10 @@ public class UserService : IUserService
         await _userManager.CreateAsync(user);
     }
 
-    public async Task<UserDto> UpdateAsync(string id, UserDtoInput userDtoInput)
+    public async Task<UserDto> UpdateAsync(int id, UserDtoInput userDtoInput)
     {
-        var user = await _userManager.FindByIdAsync(id);
+        var user = await _userManager.Users
+            .FirstOrDefaultAsync(user => user.Id == id);
         
         if (user == null) throw new Exception($"User with Id:{id} is not found.");
 
@@ -58,9 +60,10 @@ public class UserService : IUserService
         return _mapper.Map<UserDto>(user);
     }
 
-    public async Task DeleteByIdAsync(string id)
+    public async Task DeleteByIdAsync(int id)
     {
-        var user = await _userManager.FindByIdAsync(id);
+        var user = await _userManager.Users
+            .FirstOrDefaultAsync(user => user.Id == id);
 
         if (user == null) throw new Exception($"User with Id:{id} is not found.");
 
