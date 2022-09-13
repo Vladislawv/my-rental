@@ -30,11 +30,11 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(IList<UserDto>), StatusCodes.Status200OK)]
-    public async Task<IList<UserDto>> GetListAsync()
+    public async Task<IActionResult> GetListAsync()
     {
         var users = await _userService.GetListAsync();
 
-        return users;
+        return Ok(users);
     }
 
     /// <summary>
@@ -54,13 +54,13 @@ public class UserController : ControllerBase
     /// <summary>
     /// Create new User
     /// </summary>
-    /// <param name="userDtoInput"></param>
+    /// <param name="userInput"></param>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateAsync([FromBody] UserDtoInput userDtoInput)
+    public async Task<IActionResult> CreateAsync([FromBody] UserDtoInput userInput)
     {
-        var id = await _userService.CreateAsync(userDtoInput);
+        var id = await _userService.CreateAsync(userInput);
 
         return Ok(id);
     }
@@ -69,13 +69,13 @@ public class UserController : ControllerBase
     /// Update User
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="userDtoInput"></param>
+    /// <param name="userInput"></param>
     /// <returns></returns>
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] UserDtoInput userDtoInput)
+    public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] UserDtoInput userInput)
     {
-        await _userService.UpdateAsync(id, userDtoInput);
+        await _userService.UpdateAsync(id, userInput);
         
         return Ok();
     }
