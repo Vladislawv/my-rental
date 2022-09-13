@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Cryptography;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,23 +29,25 @@ public class UserService : IUserService
     public async Task<UserDto> GetByIdAsync(int id)
     {
         var user = await _userManager.Users
-            .FirstOrDefaultAsync(user => user.Id == id);
+            .Where(user => user.Id == id)
+            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
 
         if (user == null) throw new Exception($"User with Id:{id} is not found.");
 
-        return _mapper.Map<UserDto>(user);
+        return user;
     }
 
-    public async Task CreateAsync(UserDtoInput userDtoInput)
+    public async Task<int> CreateAsync(UserDtoInput userDtoInput)
     {
         var user = _mapper.Map<User>(userDtoInput);
 
-        if (user == null) throw new Exception("User must not be null.");
-
         await _userManager.CreateAsync(user);
-    }
 
-    public async Task<UserDto> UpdateAsync(int id, UserDtoInput userDtoInput)
+        return user.Id;
+    }
+    
+    public async Task UpdateAsync(int id, UserDtoInput userDtoInput)
     {
         var user = await _userManager.Users
             .FirstOrDefaultAsync(user => user.Id == id);
@@ -53,11 +56,7 @@ public class UserService : IUserService
 
         _mapper.Map(userDtoInput, user);
         
-        var result =  await _userManager.UpdateAsync(user);
-
-        if (!result.Succeeded) throw new Exception("An error occured while updating user");
-        
-        return _mapper.Map<UserDto>(user);
+        await _userManager.UpdateAsync(user);
     }
 
     public async Task DeleteByIdAsync(int id)
