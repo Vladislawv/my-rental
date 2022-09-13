@@ -39,9 +39,8 @@ public class UserService : IUserService
     public async Task<int> CreateAsync(UserDtoInput userInput)
     {
         var password = userInput.Password;
-
-        if (!PasswordValidator.Validate(password)) throw new Exception("Password must contain: upperCase, lowerCase, digit, non alphanumeric symbol, minimum length: 6.");
-
+        PasswordValidator.Validate(password);
+        
         var user = _mapper.Map<User>(userInput);
         
         await _userManager.CreateAsync(user, password);
@@ -52,9 +51,8 @@ public class UserService : IUserService
     public async Task UpdateAsync(int id, UserDtoInput userInput)
     {
         var password = userInput.Password;
-
-        if (!PasswordValidator.Validate(password)) throw new Exception("Password must contain: upperCase, lowerCase, digit, non alphanumeric symbol, minimum length: 6.");
-
+        PasswordValidator.Validate(password);
+        
         var user = await _userManager.Users
                        .FirstOrDefaultAsync(user => user.Id == id)
                    ?? throw new Exception($"User with Id:{id} is not found.");

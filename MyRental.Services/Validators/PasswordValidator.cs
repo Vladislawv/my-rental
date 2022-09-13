@@ -9,6 +9,10 @@ public static class PasswordValidator
     {
         var expression = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$";
 
-        return new Regex(expression).IsMatch(password);
+        var isPasswordStrong = new Regex(expression).IsMatch(password);
+        
+        if (!isPasswordStrong) throw new Exception("Password must contain: upperCase, lowerCase, digit, non alphanumeric symbol, minimum length: 6.");
+
+        return true;
     }
 }
