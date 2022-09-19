@@ -57,12 +57,13 @@ public class UserController : ControllerBase
     /// <param name="userInput"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateAsync([FromBody] UserDtoInput userInput)
     {
         var id = await _userService.CreateAsync(userInput);
-
-        return Ok(id);
+        var user = await _userService.GetByIdAsync(id);
+        
+        return Ok(user);
     }
 
     /// <summary>
@@ -72,12 +73,13 @@ public class UserController : ControllerBase
     /// <param name="userInput"></param>
     /// <returns></returns>
     [HttpPut("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] UserDtoInput userInput)
     {
-        await _userService.UpdateAsync(id, userInput);
+        var userId = await _userService.UpdateAsync(id, userInput);
+        var user = await _userService.GetByIdAsync(userId);
         
-        return Ok();
+        return Ok(user);
     }
 
     /// <summary>
