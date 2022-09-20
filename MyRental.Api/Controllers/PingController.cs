@@ -3,13 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MyRental.Api.Controllers;
 
+/// <summary>
+/// Ping Controller
+/// </summary>
 [ApiController]
-[Produces(MediaTypeNames.Application.Json)]
 [Route("api/ping")]
+[Produces(MediaTypeNames.Application.Json)]
 public class PingController : ControllerBase
 {
     /// <summary>
-    /// Ping controller with empty response body
+    /// Ping endpoint with empty body
     /// </summary>
     /// <returns></returns>
     [HttpGet]

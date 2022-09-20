@@ -6,7 +6,7 @@ using MyRental.Api.Middlewares;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
-using MyRental.Services.Profiles;
+using MyRental.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +21,7 @@ builder.Services.AddIdentity<User, Role>()
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddAutoMapper(typeof(TestProfile));
+builder.Services.AddAutoMapper(typeof(EntityDto));
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -29,18 +29,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Version = "v1",
         Title = "MyRental API",
-        Description = "An ASP.NET Core Web API for managing ToDo items",
-        TermsOfService = new Uri("https://localhost:5000/terms"),
-        Contact = new OpenApiContact()
-        {
-            Name = "Example contact",
-            Url = new Uri("https://localhost:5000/contact")
-        },
-        License = new OpenApiLicense()
-        {
-            Name = "Example license",
-            Url = new Uri("https://localhost:5000/license")
-        }
+        Description = "An ASP.NET Core Web API for MyRental app"
     });
 
     var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -48,6 +37,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddTransient<ISeeder<Role>, RolesSeeder>();
+
+builder.Services.AddTransient<IUserService, UserService>();
 
 var app = builder.Build();
 
