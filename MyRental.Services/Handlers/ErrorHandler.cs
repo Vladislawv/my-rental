@@ -4,8 +4,8 @@ namespace MyRental.Services.Handlers;
 
 public static class ErrorHandler
 {
-    public static void GetDescriptionFromErrors(IdentityResult result)
+    public static string GetDescriptionByIdentityResult(IdentityResult result)
     {
-        throw new Exception(result.Errors.Aggregate("", (current, error) => current + error.Description + " "));
+        return result.Errors.Aggregate("", (current, error) => current + error.Description + " ");
     }
 }

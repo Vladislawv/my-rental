@@ -41,7 +41,7 @@ public class UserService : IUserService
         var user = _mapper.Map<User>(userInput);
         
         var result = await _userManager.CreateAsync(user, userInput.Password);
-        if (!result.Succeeded) ErrorHandler.GetDescriptionFromErrors(result);
+        if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
         
         return user.Id;
     }
@@ -55,7 +55,7 @@ public class UserService : IUserService
         _mapper.Map(userInput, user);
        
         var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded) ErrorHandler.GetDescriptionFromErrors(result);
+        if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
         
         return user.Id;
     }
