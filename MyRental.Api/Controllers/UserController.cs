@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using MyRental.Services;
 using MyRental.Services.Areas.Users.Dto;
@@ -14,14 +15,17 @@ namespace MyRental.Api.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IValidator<UserDtoInput> _validator;
 
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="userService"></param>
-    public UserController(IUserService userService)
+    /// <param name="validator"></param>
+    public UserController(IUserService userService, IValidator<UserDtoInput> validator)
     {
         _userService = userService;
+        _validator = validator;
     }
     
     /// <summary>
@@ -60,6 +64,9 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateAsync([FromBody] UserDtoInput userInput)
     {
+        var result = await _validator.ValidateAsync(userInput);
+        if (!result.IsValid) throw new Exception(result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage + " "));
+        
         var id = await _userService.CreateAsync(userInput);
         var user = await _userService.GetByIdAsync(id);
         
@@ -76,6 +83,9 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] UserDtoInput userInput)
     {
+        var result = await _validator.ValidateAsync(userInput);
+        if (!result.IsValid) throw new Exception(result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage + " "));
+        
         var userId = await _userService.UpdateAsync(id, userInput);
         var user = await _userService.GetByIdAsync(userId);
         

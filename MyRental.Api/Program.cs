@@ -1,4 +1,5 @@
 using System.Reflection;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -7,6 +8,8 @@ using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
+using MyRental.Services.Areas.Users.Dto;
+using MyRental.Services.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +42,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddTransient<ISeeder<Role>, RolesSeeder>();
 
 builder.Services.AddTransient<IUserService, UserService>();
+
+builder.Services.AddScoped<IValidator<UserDtoInput>, UserDtoInputValidator>();
 
 var app = builder.Build();
 
