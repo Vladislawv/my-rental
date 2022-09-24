@@ -65,4 +65,13 @@ public class UserService : IUserService
 
         await _userManager.DeleteAsync(user);
     }
+
+    public async Task<(bool Result, string ErrorMessage)> ValidatePasswordAsync(string password)
+    {
+        var passwordValidator = new PasswordValidator<User>();
+        
+        var result = await passwordValidator.ValidateAsync(_userManager, null, password);
+
+        return (result.Succeeded, result.Errors.Aggregate("", (current, error) => (current + error.Description + " ")));
+    }
 }
