@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MyRental.Services.Areas.Users.Dto;
+using MyRental.Services.UserService;
 
 namespace MyRental.Services.Validators;
 

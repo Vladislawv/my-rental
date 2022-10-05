@@ -127,4 +127,11 @@ public class UserService : IUserService
 
         return user.Roles.ElementAt(0).Name;
     }
+    
+    public async Task<(bool Result, string ErrorMessage)> ValidatePasswordAsync(string password)
+    {
+        var result = await new PasswordValidator<User>().ValidateAsync(_userManager, null, password);
+
+        return (result.Succeeded, result.Errors.Aggregate("", (current, error) => (current + error.Description + " ")));
+    }
 }

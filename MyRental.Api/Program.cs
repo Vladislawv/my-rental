@@ -1,12 +1,20 @@
 using System.Reflection;
+using System.Text;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MyRental.Api.Attributes;
 using MyRental.Api.Middlewares;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
+using MyRental.Services.RoleService;
+using MyRental.Services.UserService;
+using MyRental.Services.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
