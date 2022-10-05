@@ -96,6 +96,9 @@ public class UserService : IUserService
         
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
+
+        await _userManager.RemovePasswordAsync(user);
+        await _userManager.AddPasswordAsync(user, userInput.Password);
         
         await _userManager.RemoveFromRoleAsync(user, user.Roles.ElementAt(0).Name);
         await _userManager.AddToRoleAsync(user, userInput.Role);
