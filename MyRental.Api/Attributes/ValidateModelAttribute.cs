@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
-using MyRental.Services;
 using MyRental.Services.Areas.Users.Dto;
+using MyRental.Services.UserService;
 using MyRental.Services.Validators;
 
 namespace MyRental.Api.Attributes;

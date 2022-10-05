@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Validators;
+using MyRental.Services.UserService;
 
 namespace MyRental.Services.Validators;
 
