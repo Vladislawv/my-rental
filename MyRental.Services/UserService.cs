@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.Handlers;
 
 namespace MyRental.Services;
 
@@ -40,8 +39,7 @@ public class UserService : IUserService
     {
         var user = _mapper.Map<User>(userInput);
         
-        var result = await _userManager.CreateAsync(user, userInput.Password);
-        if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
+        await _userManager.CreateAsync(user, userInput.Password);
         
         return user.Id;
     }
@@ -54,9 +52,8 @@ public class UserService : IUserService
         
         _mapper.Map(userInput, user);
        
-        var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
-        
+        await _userManager.UpdateAsync(user);
+
         return user.Id;
     }
 
@@ -67,5 +64,12 @@ public class UserService : IUserService
                 ?? throw new Exception($"User with Id:{id} is not found.");
 
         await _userManager.DeleteAsync(user);
+    }
+
+    public async Task<(bool Result, string ErrorMessage)> ValidatePasswordAsync(string password)
+    {
+        var result = await new PasswordValidator<User>().ValidateAsync(_userManager, null, password);
+
+        return (result.Succeeded, result.Errors.Aggregate("", (current, error) => (current + error.Description + " ")));
     }
 }
