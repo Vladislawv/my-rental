@@ -58,7 +58,7 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, loggedInUser.Login),
+            new Claim(ClaimTypes.NameIdentifier, loggedInUser.UserName),
             new Claim(ClaimTypes.Role, await _userService.GetRoleNameByIdAsync(loggedInUser.Id))
         };
         
