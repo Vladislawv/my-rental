@@ -1,21 +1,19 @@
 using System.Reflection;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer; 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyRental.Api.Middlewares;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
-using MyRental.Services.RoleService;
-using MyRental.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(config => config.Filters.Add<ValidateModelAttribute>());
+
+builder.Services.AddFluentValidation(configuration =>
+    configuration.RegisterValidatorsFromAssembly(typeof(ValidationRuleBuilderExtensions).Assembly));
 
 builder.Services.AddDbContext<MyRentalContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyRentalDatabase")));
