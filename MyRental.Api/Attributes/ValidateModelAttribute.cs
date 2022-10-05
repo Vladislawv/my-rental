@@ -1,6 +1,7 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using MyRental.Services;
 using MyRental.Services.Areas.Users.Dto;
+using MyRental.Services.Validators;
 
 namespace MyRental.Api.Attributes;
 
@@ -9,31 +10,32 @@ namespace MyRental.Api.Attributes;
 /// </summary>
 public class ValidateModelAttribute : ActionFilterAttribute
 {
-    private readonly IValidator<UserDtoInput> _validator;
+    private readonly IUserService _userService;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="validator"></param>
-    public ValidateModelAttribute(IValidator<UserDtoInput> validator)
+    /// <param name="userService"></param>
+    public ValidateModelAttribute(IUserService userService)
     {
-        _validator = validator;
+        _userService = userService;
     }
 
     /// <summary>
-    /// Validate input model
+    /// Validate userInput model
     /// </summary>
     /// <param name="context"></param>
     /// <param name="next"></param>
     /// <returns></returns>
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var value = context.ActionArguments["userInput"]
-                    ?? throw new Exception("The input is empty!");
+        if (context.ActionArguments.ContainsKey("userInput")) {
+            var userInput = (UserDtoInput)(context.ActionArguments["userInput"] 
+                ?? throw new Exception("The input is empty!"));
 
-        var userInput = (UserDtoInput)value;
+            await new UserDtoInputValidator(_userService).ValidateAsync(userInput);
+        }
 
-        var result = await _validator.ValidateAsync(userInput);
-        if (!result.IsValid) throw new Exception(result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage + " "));
+        await next.Invoke();
     }
 }

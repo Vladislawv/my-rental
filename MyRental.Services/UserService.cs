@@ -68,9 +68,7 @@ public class UserService : IUserService
 
     public async Task<(bool Result, string ErrorMessage)> ValidatePasswordAsync(string password)
     {
-        var passwordValidator = new PasswordValidator<User>();
-        
-        var result = await passwordValidator.ValidateAsync(_userManager, null, password);
+        var result = await new PasswordValidator<User>().ValidateAsync(_userManager, null, password);
 
         return (result.Succeeded, result.Errors.Aggregate("", (current, error) => (current + error.Description + " ")));
     }

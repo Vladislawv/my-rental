@@ -7,6 +7,9 @@ public class UserDtoInputValidator : AbstractValidator<UserDtoInput>
 {
     public UserDtoInputValidator(IUserService userService)
     {
+        RuleFor(user => user.UserName)
+            .Length(3, 15);
+        
         RuleFor(user => user.Email)
             .EmailAddress();
 
@@ -15,5 +18,8 @@ public class UserDtoInputValidator : AbstractValidator<UserDtoInput>
 
         RuleFor(user => user.Password)
             .UserPassword(userService);
+
+        RuleFor(user => user.Role)
+            .NotEmpty();
     }
 }
