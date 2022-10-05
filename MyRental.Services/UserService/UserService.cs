@@ -47,13 +47,11 @@ public class UserService : IUserService
         
         var isPasswordMatch = await _userManager.CheckPasswordAsync(user, login.Password);
 
-        return isPasswordMatch ? _mapper.Map<UserDto>(user) : throw new Exception("Password is invalid");
+        return isPasswordMatch ? _mapper.Map<UserDto>(user) : throw new Exception("Password is not match");
     }
     
     public async Task<int> CreateAsync(UserDtoInput userInput)
     {
-        if (string.IsNullOrEmpty(userInput.Role)) throw new Exception("Role field is required.");
-
         var userWithSameEmail = await _userManager.FindByEmailAsync(userInput.Email);
 
         if (userWithSameEmail != null) throw new Exception("This email is already used.");
@@ -75,8 +73,6 @@ public class UserService : IUserService
     
     public async Task<int> UpdateByIdAsync(int id, UserDtoInput userInput)
     {
-        if (string.IsNullOrEmpty(userInput.Role)) throw new Exception("Role field is required.");
-
         var user = await _userManager.Users
             .FirstOrDefaultAsync(user => user.Id == id) 
                 ?? throw new Exception($"User with Id:{id} is not found.");
