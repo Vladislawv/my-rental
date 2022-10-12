@@ -52,14 +52,9 @@ public class UserService : IUserService
     
     public async Task<int> CreateAsync(UserDtoInput userInput)
     {
-        var userWithSameEmail = await _userManager.FindByEmailAsync(userInput.Email);
+        await CheckIfEmailIsFreeAsync(userInput.Email);
 
-        if (userWithSameEmail != null) throw new Exception("This email is already used.");
-
-        var userWithSamePhoneNumber = await _userManager.Users
-            .FirstOrDefaultAsync(u => u.PhoneNumber == userInput.PhoneNumber);
-
-        if (userWithSamePhoneNumber != null) throw new Exception("This Phone number is already taken.");
+        await CheckIfPhoneNumberIsFreeAsync(userInput.PhoneNumber);
 
         var user = _mapper.Map<User>(userInput);
         
@@ -73,24 +68,11 @@ public class UserService : IUserService
     
     public async Task<int> UpdateByIdAsync(int id, UserDtoInput userInput)
     {
-        var user = await _userManager.Users
-            .FirstOrDefaultAsync(user => user.Id == id) 
-                ?? throw new Exception($"User with Id:{id} is not found.");
+        var user = await GetEntityByIdAsync(id);
 
-        if (user.Email != userInput.Email)
-        {
-            var userWithSameEmail = await _userManager.FindByEmailAsync(userInput.Email);
+        if (user.Email != userInput.Email) await CheckIfEmailIsFreeAsync(userInput.Email);
 
-            if (userWithSameEmail != null) throw new Exception("This email is already used.");
-        }
-
-        if (user.PhoneNumber != userInput.PhoneNumber)
-        {
-            var userWithSamePhoneNumber = await _userManager.Users
-                .FirstOrDefaultAsync(u => u.PhoneNumber == userInput.PhoneNumber);
-
-            if (userWithSamePhoneNumber != null) throw new Exception("This Phone number is already taken.");
-        }
+        if (user.PhoneNumber != userInput.PhoneNumber) await CheckIfPhoneNumberIsFreeAsync(userInput.PhoneNumber);
 
         _mapper.Map(userInput, user);
         
@@ -108,9 +90,7 @@ public class UserService : IUserService
 
     public async Task DeleteByIdAsync(int id)
     {
-        var user = await _userManager.Users
-            .FirstOrDefaultAsync(user => user.Id == id)
-                ?? throw new Exception($"User with Id:{id} is not found.");
+        var user = await GetEntityByIdAsync(id);
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
@@ -118,9 +98,7 @@ public class UserService : IUserService
 
     public async Task<string> GetRoleNameByIdAsync(int id)
     {
-        var user = await _userManager.Users
-            .FirstOrDefaultAsync(u => u.Id == id)
-                ?? throw new Exception($"User with Id:{id} is not found.");
+        var user = await GetEntityByIdAsync(id);
 
         return user.Roles.ElementAt(0).Name;
     }
@@ -130,5 +108,27 @@ public class UserService : IUserService
         var result = await new PasswordValidator<User>().ValidateAsync(_userManager, null, password);
 
         return (result.Succeeded, result.Errors.Aggregate("", (current, error) => (current + error.Description + " ")));
+    }
+
+    private async Task CheckIfEmailIsFreeAsync(string email)
+    {
+        var userWithSameEmail = await _userManager.FindByEmailAsync(email);
+
+        if (userWithSameEmail != null) throw new Exception("This email is already used.");
+    }
+
+    private async Task CheckIfPhoneNumberIsFreeAsync(string phoneNumber)
+    {
+        var userWithSamePhoneNumber = await _userManager.Users
+            .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+
+        if (userWithSamePhoneNumber != null) throw new Exception("This Phone number is already taken.");
+    }
+
+    private async Task<User> GetEntityByIdAsync(int id)
+    {
+        return await _userManager.Users
+            .FirstOrDefaultAsync(user => user.Id == id)
+                ?? throw new Exception($"User with Id:{id} is not found.");
     }
 }

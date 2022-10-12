@@ -14,7 +14,7 @@ namespace MyRental.Api.Controllers;
 [ApiController]
 [Route("api/users")]
 [Produces(MediaTypeNames.Application.Json)]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -37,6 +37,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(IList<UserDto>), StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<IActionResult> GetListAsync()
     {
         var users = await _userService.GetListAsync();
@@ -51,6 +52,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<IActionResult> GetByIdAsync([FromRoute] int id)
     {
         var user = await _userService.GetByIdAsync(id);
@@ -65,6 +67,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<IActionResult> CreateAsync([FromBody] UserDtoInput userInput)
     {
         var id = await _userService.CreateAsync(userInput);
@@ -110,6 +113,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpPost("roles/{id:int}")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<IActionResult> AddAdminRoleByIdAsync([FromRoute] int id)
     {
         await _roleService.AddAdminRoleByIdAsync(id);
@@ -124,6 +128,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpDelete("roles/{id:int}")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<IActionResult> RemoveAdminRoleByIdAsync([FromRoute] int id)
     {
         await _roleService.RemoveAdminRoleByIdAsync(id);

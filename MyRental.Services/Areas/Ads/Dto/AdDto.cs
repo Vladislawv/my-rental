@@ -1,6 +1,4 @@
-﻿using MyRental.Infrastructure.Entities;
-
-namespace MyRental.Services.Areas.Ads.Dto;
+﻿namespace MyRental.Services.Areas.Ads.Dto;
 
 public class AdDto : EntityDto
 {
@@ -14,6 +12,4 @@ public class AdDto : EntityDto
     public double Price { get; set; }
     public string Description { get; set; }
     public DateTime CreatedDate { get; set; }
-
-    public virtual User User { get; set; }
 }
