@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.Validators;
-using MyRental.Services.UserService;
+using MyRental.Services.Areas.Users.Services.UserService;
 
-namespace MyRental.Services.Validators;
+namespace MyRental.Services.Areas.Users.Validators;
 
 public class PasswordValidator<T> : PropertyValidator<T, string>
 {

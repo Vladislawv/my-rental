@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using MyRental.Services.UserService;
+using MyRental.Services.Areas.Users.Services.UserService;
 
-namespace MyRental.Services.Validators;
+namespace MyRental.Services.Areas.Users.Validators;
 
 public static class ValidationRuleBuilderExtensions
 {

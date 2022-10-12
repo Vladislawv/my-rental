@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.RoleService;
-using MyRental.Services.UserService;
+using MyRental.Services.Areas.Users.Services.RoleService;
+using MyRental.Services.Areas.Users.Services.UserService;
 
 namespace MyRental.Api.Controllers;
 
@@ -95,12 +95,12 @@ public class UserController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpDelete("{id:int}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteByIdAsync([FromRoute] int id)
     {
-        var result = await _userService.DeleteByIdAsync(id);
+        await _userService.DeleteByIdAsync(id);
 
-        return Ok(result);
+        return Ok();
     }
 
     /// <summary>
@@ -112,9 +112,9 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<IActionResult> AddAdminRoleByIdAsync([FromRoute] int id)
     {
-        var result = await _roleService.AddAdminRoleByIdAsync(id);
+        await _roleService.AddAdminRoleByIdAsync(id);
 
-        return Ok(result);
+        return Ok();
     }
 
     /// <summary>
@@ -126,8 +126,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<IActionResult> RemoveAdminRoleByIdAsync([FromRoute] int id)
     {
-        var result = await _roleService.RemoveAdminRoleByIdAsync(id);
+        await _roleService.RemoveAdminRoleByIdAsync(id);
 
-        return Ok(result);
+        return Ok();
     }
 }

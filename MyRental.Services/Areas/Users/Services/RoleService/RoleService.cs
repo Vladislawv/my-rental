@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Handlers;
 
-namespace MyRental.Services.RoleService;
+namespace MyRental.Services.Areas.Users.Services.RoleService;
 
 public class RoleService : IRoleService
 {
@@ -14,7 +14,7 @@ public class RoleService : IRoleService
         _userManager = userManager;
     }
 
-    public async Task<bool> AddAdminRoleByIdAsync(int id)
+    public async Task AddAdminRoleByIdAsync(int id)
     {
         var user = await _userManager.Users
             .FirstOrDefaultAsync(u => u.Id == id)
@@ -24,11 +24,9 @@ public class RoleService : IRoleService
         
         var result = await _userManager.AddToRoleAsync(user, "Admin");
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
-
-        return true;
     }
 
-    public async Task<bool> RemoveAdminRoleByIdAsync(int id)
+    public async Task RemoveAdminRoleByIdAsync(int id)
     {
         var user = await _userManager.Users
             .FirstOrDefaultAsync(u => u.Id == id) 
@@ -38,7 +36,5 @@ public class RoleService : IRoleService
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
 
         await _userManager.AddToRoleAsync(user, "Tenant");
-        
-        return true;
     }
 }

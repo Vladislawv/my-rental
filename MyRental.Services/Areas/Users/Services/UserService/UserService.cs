@@ -6,7 +6,7 @@ using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Users.Dto;
 using MyRental.Services.Handlers;
 
-namespace MyRental.Services.UserService;
+namespace MyRental.Services.Areas.Users.Services.UserService;
 
 public class UserService : IUserService
 {
@@ -106,7 +106,7 @@ public class UserService : IUserService
         return user.Id;
     }
 
-    public async Task<bool> DeleteByIdAsync(int id)
+    public async Task DeleteByIdAsync(int id)
     {
         var user = await _userManager.Users
             .FirstOrDefaultAsync(user => user.Id == id)
@@ -114,8 +114,6 @@ public class UserService : IUserService
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
-
-        return true;
     }
 
     public async Task<string> GetRoleNameByIdAsync(int id)

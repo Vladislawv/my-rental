@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.UserService;
+using MyRental.Services.Areas.Users.Services.UserService;
 
 namespace MyRental.Api.Controllers;
 
@@ -58,7 +58,10 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, loggedInUser.UserName),
+            new Claim(ClaimTypes.NameIdentifier, loggedInUser.Id + ""),
+            new Claim(ClaimTypes.Name, loggedInUser.UserName),
+            new Claim(ClaimTypes.Email, loggedInUser.Email),
+            new Claim(ClaimTypes.MobilePhone, loggedInUser.PhoneNumber),
             new Claim(ClaimTypes.Role, await _userService.GetRoleNameByIdAsync(loggedInUser.Id))
         };
         
