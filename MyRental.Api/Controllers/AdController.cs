@@ -41,6 +41,20 @@ public class AdController : ControllerBase
     }
 
     /// <summary>
+    /// Get filtered List of all Ads
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    [HttpGet("filter")]
+    [ProducesResponseType(typeof(IList<AdDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetFilteredListAsync([FromQuery] FilterDtoInput filter)
+    {
+        var ads = await _adService.GetFilteredListAsync(filter);
+
+        return Ok(ads);
+    }
+
+    /// <summary>
     /// Get Ad by Id
     /// </summary>
     /// <param name="id"></param>

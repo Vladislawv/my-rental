@@ -25,6 +25,22 @@ public class AdService : IAdService
             .ToListAsync();
     }
 
+    public async Task<IList<AdDto>> GetFilteredListAsync(FilterDtoInput filter)
+    {
+        var query = _context.Ads
+            .ProjectTo<AdDto>(_mapper.ConfigurationProvider);
+
+        if (filter.Country != null) query = query.Where(ad => ad.Country == filter.Country);
+        if (filter.City != null) query = query.Where(ad => ad.City == filter.City);
+        if (filter.Area != null) query = query.Where(ad => ad.Area == filter.Area);
+        if (filter.Rooms != 0) query = query.Where(ad => ad.Rooms == filter.Rooms);
+        if (filter.Square != 0) query = query.Where(ad => ad.Square > filter.Square);
+        if (filter.Price != 0.0d) query = query.Where(ad => ad.Price < filter.Price);
+        if (filter.CreatedDate.Year != 1) query = query.Where(ad => ad.CreatedDate > filter.CreatedDate);
+
+        return await query.ToListAsync();
+    }
+
     public async Task<AdDto> GetByIdAsync(int id)
     {
         return await _context.Ads
