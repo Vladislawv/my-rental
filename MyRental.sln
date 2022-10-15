@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyRental.Services", "MyRent
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyRental.Infrastructure", "MyRental.Infrastructure\MyRental.Infrastructure.csproj", "{29830BE4-09E5-4A6F-880C-96DD33A66D41}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyRental.Blazor", "MyRental.Blazor\MyRental.Blazor.csproj", "{09383A7A-0A42-4865-9BA1-E1BB89B4FC9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{29830BE4-09E5-4A6F-880C-96DD33A66D41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29830BE4-09E5-4A6F-880C-96DD33A66D41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29830BE4-09E5-4A6F-880C-96DD33A66D41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09383A7A-0A42-4865-9BA1-E1BB89B4FC9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09383A7A-0A42-4865-9BA1-E1BB89B4FC9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09383A7A-0A42-4865-9BA1-E1BB89B4FC9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09383A7A-0A42-4865-9BA1-E1BB89B4FC9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

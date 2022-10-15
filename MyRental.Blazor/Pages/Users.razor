@@ -1,0 +1,51 @@
+﻿@page "/users"
+@using MyRental.Services.Areas.Users.Services
+@using MyRental.Services.Areas.Users.Dto
+
+<PageTitle>Users</PageTitle>
+@inject IUserService UserService
+
+<h1>All Users</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (users == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Id</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in users)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>@user.PhoneNumber</td>
+                <td>@user.Id</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IList<UserDto> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetListAsync();
+    }
+
+}
