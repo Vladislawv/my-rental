@@ -6,7 +6,7 @@ using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Users.Dto;
 using MyRental.Services.Handlers;
 
-namespace MyRental.Services.Areas.Users.Services.UserService;
+namespace MyRental.Services.Areas.Users.Services;
 
 public class UserService : IUserService
 {

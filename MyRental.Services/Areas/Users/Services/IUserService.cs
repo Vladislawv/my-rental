@@ -1,6 +1,6 @@
 ﻿using MyRental.Services.Areas.Users.Dto;
 
-namespace MyRental.Services.Areas.Users.Services.UserService;
+namespace MyRental.Services.Areas.Users.Services;
 
 public interface IUserService
 {

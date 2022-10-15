@@ -2,7 +2,7 @@
 using MyRental.Services.Areas.Ads.Dto;
 using MyRental.Services.Areas.Ads.Validators;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.Areas.Users.Services.UserService;
+using MyRental.Services.Areas.Users.Services;
 using MyRental.Services.Areas.Users.Validators;
 
 namespace MyRental.Api.Attributes;

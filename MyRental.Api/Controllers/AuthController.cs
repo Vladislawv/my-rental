@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.Areas.Users.Services.UserService;
+using MyRental.Services.Areas.Users.Services;
 
 namespace MyRental.Api.Controllers;
 

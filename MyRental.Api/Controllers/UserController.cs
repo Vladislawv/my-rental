@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.Areas.Users.Services.RoleService;
-using MyRental.Services.Areas.Users.Services.UserService;
+using MyRental.Services.Areas.Users.Services;
 
 namespace MyRental.Api.Controllers;
 
@@ -18,17 +17,14 @@ namespace MyRental.Api.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
-    private readonly IRoleService _roleService;
 
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="userService"></param>
-    /// <param name="roleService"></param>
-    public UserController(IUserService userService, IRoleService roleService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
-        _roleService = roleService;
     }
     
     /// <summary>
@@ -101,36 +97,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> DeleteByIdAsync([FromRoute] int id)
     {
         await _userService.DeleteByIdAsync(id);
-
-        return Ok();
-    }
-
-    /// <summary>
-    /// Add Admin role to User by Id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpPost("roles/{id:int}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public async Task<IActionResult> AddAdminRoleByIdAsync([FromRoute] int id)
-    {
-        await _roleService.AddAdminRoleByIdAsync(id);
-
-        return Ok();
-    }
-
-    /// <summary>
-    /// Remove Admin role from User by Id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    [HttpDelete("roles/{id:int}")]
-    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public async Task<IActionResult> RemoveAdminRoleByIdAsync([FromRoute] int id)
-    {
-        await _roleService.RemoveAdminRoleByIdAsync(id);
 
         return Ok();
     }

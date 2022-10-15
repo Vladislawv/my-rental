@@ -13,8 +13,7 @@ using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
 using MyRental.Services.Areas.Ads.Services;
-using MyRental.Services.Areas.Users.Services.RoleService;
-using MyRental.Services.Areas.Users.Services.UserService;
+using MyRental.Services.Areas.Users.Services;
 using MyRental.Services.Areas.Users.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,8 +91,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddTransient<ISeeder<Role>, RolesSeeder>();
 
 builder.Services.AddTransient<IUserService, UserService>();
-
-builder.Services.AddTransient<IRoleService, RoleService>();
 
 builder.Services.AddTransient<IAdService, AdService>();
 
