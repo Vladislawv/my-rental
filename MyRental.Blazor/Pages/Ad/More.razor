@@ -1,0 +1,93 @@
+﻿@page "/ads/{Id:int}"
+
+@inject IAdService AdService
+
+<PageTitle>More</PageTitle>
+
+@if (_ad == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    @if (_ad.Medias.Any())
+    {
+        <table class="table-hover">
+            <thead class="custom">
+            <tr>
+                <th>
+                    <img src="@_ad.Medias.ElementAt(_currentMedia).Data" alt="Photo"/>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <button class="btn btn-primary medium-size" @onclick="ShowPreviousMedia"><i class="bi bi-arrow-left-circle-fill"></i></button>
+                    <button class="btn btn-primary medium-size" @onclick="ShowNextMedia"><i class="bi bi-arrow-right-circle-fill"></i></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    }
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Country</th>
+            <th>City</th>
+            <th>Area</th>
+            <th>Title</th>
+            <th>Rooms</th>
+            <th>Square</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Updated</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>@_ad.Country</td>
+            <td>@_ad.City</td>
+            <td>@_ad.Area</td>
+            <td>@_ad.Title</td>
+            <td>@_ad.Rooms</td>
+            <td>@_ad.Square</td>
+            <td>@_ad.Price</td>
+            <td>@_ad.Description</td>
+            <td>@_ad.CreatedDate.ToShortDateString()</td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+    <br/>
+    
+    <button class="btn btn-info auto-width"><a href="/ads"><i class="bi bi-arrow-bar-left"></i></a></button>
+}
+
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    AdDto? _ad;
+    int _currentMedia;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _ad = await AdService.GetByIdAsync(Id);
+    }
+
+    private void ShowPreviousMedia()
+    {
+        _currentMedia = _currentMedia == 0 ? _ad.Medias.Count - 1 : _currentMedia -= 1;
+    }
+
+    private void ShowNextMedia()
+    {
+        _currentMedia = _currentMedia == _ad.Medias.Count - 1 ? 0 : _currentMedia += 1;
+    }
+}

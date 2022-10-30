@@ -38,10 +38,15 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> RegisterAsync([FromBody] UserDtoInput userInput)
     {
-        var userId = await _userService.CreateAsync(userInput);
-        var user = await _userService.GetByIdAsync(userId);
-        
-        return Ok(user);
+        await _userService.CreateAsync(userInput);
+
+        var login = new LoginDto
+        {
+            Email = userInput.Email,
+            Password = userInput.Password
+        };
+
+        return await LoginAsync(login);
     }
     
     

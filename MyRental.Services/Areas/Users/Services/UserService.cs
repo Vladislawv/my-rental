@@ -38,11 +38,11 @@ public class UserService : IUserService
     
     public async Task<UserDto> GetByLoginAsync(LoginDto login)
     {
-        if (string.IsNullOrEmpty(login.Login) || string.IsNullOrEmpty(login.Password)) 
+        if (string.IsNullOrEmpty(login.Email) || string.IsNullOrEmpty(login.Password)) 
             throw new Exception("Input data is empty.");
 
         var user = await _userManager.Users
-            .FirstOrDefaultAsync(u => u.UserName == login.Login || u.Email == login.Login)
+            .FirstOrDefaultAsync(u => u.Email == login.Email)
                 ?? throw new Exception("This user is not found.");
         
         var isPasswordMatch = await _userManager.CheckPasswordAsync(user, login.Password);

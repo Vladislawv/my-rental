@@ -13,7 +13,6 @@ namespace MyRental.Api.Controllers;
 [ApiController]
 [Route("api/adverts")]
 [Produces(MediaTypeNames.Application.Json)]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class AdController : ControllerBase
 {
     private readonly IAdService _adService;
@@ -36,6 +35,20 @@ public class AdController : ControllerBase
     public async Task<IActionResult> GetListAsync()
     {
         var ads = await _adService.GetListAsync();
+
+        return Ok(ads);
+    }
+
+    /// <summary>
+    /// Get list of User Ads
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("user/{id:int}")]
+    [ProducesResponseType(typeof(IList<AdDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUserListAsync([FromRoute] int id)
+    {
+        var ads = await _adService.GetUserListAsync(id);
 
         return Ok(ads);
     }
@@ -75,6 +88,7 @@ public class AdController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(AdDto), StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateAsync([FromBody] AdDtoInput adInput)
     {
         var adId = await _adService.CreateAsync(adInput);
@@ -91,6 +105,7 @@ public class AdController : ControllerBase
     /// <returns></returns>
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(AdDto), StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> UpdateByIdAsync([FromRoute] int id, [FromBody] AdDtoInput adInput)
     {
         var adId = await _adService.UpdateByIdAsync(id, adInput);
@@ -106,6 +121,7 @@ public class AdController : ControllerBase
     /// <returns></returns>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> DeleteByIdAsync([FromRoute] int id)
     {
         await _adService.DeleteByIdAsync(id);

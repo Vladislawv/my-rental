@@ -1,6 +1,6 @@
 ﻿namespace MyRental.Infrastructure.Entities;
 
-public class Ad : IEntity
+public class Advertisement : IEntity
 {
     public int Id { get; set; }
     public int UserId { get; set; }
@@ -15,4 +15,5 @@ public class Ad : IEntity
     public DateTime CreatedDate { get; set; }
 
     public virtual User User { get; set; }
+    public virtual ICollection<MediaFile> Medias { get; set; }
 }

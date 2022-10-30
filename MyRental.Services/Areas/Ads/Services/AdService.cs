@@ -4,18 +4,21 @@ using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Ads.Dto;
+using MyRental.Services.Areas.Users.Services;
 
 namespace MyRental.Services.Areas.Ads.Services;
 
 public class AdService : IAdService
 {
+    private readonly IUserService _userService;
     private readonly MyRentalContext _context;
     private readonly IMapper _mapper;
 
-    public AdService(MyRentalContext context, IMapper mapper)
+    public AdService(MyRentalContext context, IMapper mapper, IUserService userService)
     {
         _context = context;
         _mapper = mapper;
+        _userService = userService;
     }
 
     public async Task<IList<AdDto>> GetListAsync()
@@ -25,14 +28,21 @@ public class AdService : IAdService
             .ToListAsync();
     }
 
+    public async Task<IList<AdDto>> GetUserListAsync(int id)
+    {
+        var user = await _userService.GetByIdAsync(id);
+
+        return user.Ads;
+    }
+
     public async Task<IList<AdDto>> GetFilteredListAsync(FilterDtoInput filter)
     {
         var query = _context.Ads
             .ProjectTo<AdDto>(_mapper.ConfigurationProvider);
 
-        if (filter.Country != null) query = query.Where(ad => ad.Country == filter.Country);
-        if (filter.City != null) query = query.Where(ad => ad.City == filter.City);
-        if (filter.Area != null) query = query.Where(ad => ad.Area == filter.Area);
+        if (!string.IsNullOrEmpty(filter.Country)) query = query.Where(ad => ad.Country == filter.Country);
+        if (!string.IsNullOrEmpty(filter.City)) query = query.Where(ad => ad.City == filter.City);
+        if (!string.IsNullOrEmpty(filter.Area)) query = query.Where(ad => ad.Area == filter.Area);
         if (filter.Rooms != 0) query = query.Where(ad => ad.Rooms == filter.Rooms);
         if (filter.Square != 0) query = query.Where(ad => ad.Square > filter.Square);
         if (filter.Price != 0.0d) query = query.Where(ad => ad.Price < filter.Price);
@@ -53,7 +63,7 @@ public class AdService : IAdService
     {
         await CheckIfTitleIsFreeAsync(adInput.Title);
         
-        var ad = _mapper.Map<Ad>(adInput);
+        var ad = _mapper.Map<Advertisement>(adInput);
 
         await _context.Ads.AddAsync(ad);
         await _context.SaveChangesAsync();
@@ -91,7 +101,7 @@ public class AdService : IAdService
         if (adWithSameTitle != null) throw new Exception("Ad with this title is already exists.");
     }
 
-    private async Task<Ad> GetEntityByIdAsync(int id)
+    private async Task<Advertisement> GetEntityByIdAsync(int id)
     {
         return await _context.Ads
             .FirstOrDefaultAsync(ad => ad.Id == id)

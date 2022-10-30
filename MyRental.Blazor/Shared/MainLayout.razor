@@ -1,19 +1,49 @@
 ﻿@inherits LayoutComponentBase
 
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavManager
+
 <PageTitle>MyRental.Blazor</PageTitle>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
+<header>
+    <a href="/"><img src="images/MR.png" alt="My Rental" width="90" height="90"/></a>
+    <ul>
+    <AuthorizeView>
+        <Authorized>
+            <li><a href="/user/account"><i class="bi bi-house-fill"></i> Account</a></li>
+            <li><a @onclick="Logout" href="javascript:void(0)"><i class="bi bi-door-closed-fill"></i>Logout</a></li>
+        </Authorized>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+        <NotAuthorized>
+            <li><a href="/auth/sign-up"><i class="bi bi-door-open"></i>Register</a></li>
+            <li><a href="/auth/login"><i class="bi bi-door-open"></i>Login</a></li>
+        </NotAuthorized>
+    </AuthorizeView>
+    </ul>
+</header>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<main>
+    <article class="content px-4">
+        <ErrorBoundary>
+            <ChildContent>
+                @Body
+            </ChildContent>
+            <ErrorContent Context="exception">
+                <div>
+                    <h3>@exception.GetType()</h3>
+                    <h3>@exception.Message</h3>
+                    <h3></h3>
+                </div>
+            </ErrorContent>
+        </ErrorBoundary>
+    </article>
+</main>
+
+@code{
+    private async Task Logout()
+    {
+        var customAuthStateProvider = (MyAuthenticationStateProvider)AuthStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationStateAsync(null);
+        NavManager.NavigateTo("/", true);
+    }
+}

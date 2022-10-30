@@ -1,8 +1,11 @@
-﻿namespace MyRental.Services.Areas.Ads.Dto;
+﻿using MyRental.Infrastructure.Entities;
+
+namespace MyRental.Services.Areas.Ads.Dto;
 
 public class AdDtoInput
 {
     public int UserId { get; set; }
+    public ICollection<MediaFile> Medias { get; set; }
     public string Country { get; set; }
     public string City { get; set; }
     public string Area { get; set; }

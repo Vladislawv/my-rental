@@ -7,7 +7,8 @@ public class AdMappingProfile : Profile
 {
     public AdMappingProfile()
     {
-        CreateMap<AdDtoInput, Ad>();
-        CreateMap<Ad, AdDto>();
+        CreateMap<AdDtoInput, Advertisement>();
+        CreateMap<Advertisement, AdDto>();
+        CreateMap<AdDto, AdDtoInput>();
     }
 }

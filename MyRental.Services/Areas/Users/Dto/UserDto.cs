@@ -7,5 +7,6 @@ public class UserDto : EntityDto
     public string UserName { get; set; }
     public string Email { get; set; }
     public string PhoneNumber { get; set; }
-    public virtual ICollection<AdDto> Ads { get; set; }
+
+    public IList<AdDto> Ads { get; set; }
 }

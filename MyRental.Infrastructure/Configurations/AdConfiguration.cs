@@ -4,9 +4,9 @@ using MyRental.Infrastructure.Entities;
 
 namespace MyRental.Infrastructure.Configurations;
 
-public class AdConfiguration : IEntityTypeConfiguration<Ad>
+public class AdConfiguration : IEntityTypeConfiguration<Advertisement>
 {
-    public void Configure(EntityTypeBuilder<Ad> builder)
+    public void Configure(EntityTypeBuilder<Advertisement> builder)
     {
         builder.HasOne(ad => ad.User)
             .WithMany(user => user.Ads)

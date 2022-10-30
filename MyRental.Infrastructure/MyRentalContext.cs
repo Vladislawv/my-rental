@@ -10,7 +10,8 @@ public class MyRentalContext : IdentityDbContext<User, Role, int, IdentityUserCl
     IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>
 {
     private readonly ISeeder<Role> _rolesSeeder;
-    public DbSet<Ad> Ads { get; set; }
+    public DbSet<MediaFile> Medias { get; set; }
+    public DbSet<Advertisement> Ads { get; set; }
 
     public MyRentalContext(DbContextOptions<MyRentalContext> options, ISeeder<Role> rolesSeeder) : base(options)
     {

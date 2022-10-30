@@ -13,6 +13,7 @@ using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
 using MyRental.Services.Areas.Ads.Services;
+using MyRental.Services.Areas.Medias.Services;
 using MyRental.Services.Areas.Users.Services;
 using MyRental.Services.Areas.Users.Validators;
 
@@ -93,6 +94,8 @@ builder.Services.AddTransient<ISeeder<Role>, RolesSeeder>();
 builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.AddTransient<IAdService, AdService>();
+
+builder.Services.AddTransient<IMediaService, MediaService>();
 
 var app = builder.Build();
 
