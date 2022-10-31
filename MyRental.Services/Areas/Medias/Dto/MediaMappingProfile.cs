@@ -9,5 +9,6 @@ public class MediaMappingProfile : Profile
     {
         CreateMap<MediaDtoInput, MediaFile>();
         CreateMap<MediaFile, MediaDto>();
+        CreateMap<MediaDto, MediaDtoInput>();
     }
 }

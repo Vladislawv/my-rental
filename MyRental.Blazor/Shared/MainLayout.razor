@@ -1,7 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-@inject AuthenticationStateProvider AuthStateProvider
-@inject NavigationManager NavManager
+@inject AuthenticationStateProvider AuthProvider
 
 <PageTitle>MyRental.Blazor</PageTitle>
 
@@ -42,8 +41,7 @@
 @code{
     private async Task Logout()
     {
-        var customAuthStateProvider = (MyAuthenticationStateProvider)AuthStateProvider;
-        await customAuthStateProvider.UpdateAuthenticationStateAsync(null);
-        NavManager.NavigateTo("/", true);
+        var myProvider = (MyAuthenticationStateProvider)AuthProvider;
+        await myProvider.LogoutAsync();
     }
 }

@@ -1,5 +1,5 @@
 ﻿@page "/ads/edit/{UserId:int}/{AdId:int}"
-@using MyRental.Infrastructure.Entities
+
 @attribute [Authorize]
 
 @inject IJSRuntime Js
@@ -214,7 +214,7 @@
 
         var nameAndExtension = e.File.Name.Split(".");
 
-        var file = new MediaFile
+        var file = new MediaDtoInput
         {
             AdId = AdId,
             Data = imageData,

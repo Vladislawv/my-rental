@@ -12,9 +12,9 @@ using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
-using MyRental.Services.Areas.Ads.Services;
-using MyRental.Services.Areas.Medias.Services;
-using MyRental.Services.Areas.Users.Services;
+using MyRental.Services.Areas.Ads;
+using MyRental.Services.Areas.Medias;
+using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Validators;
 
 var builder = WebApplication.CreateBuilder(args);

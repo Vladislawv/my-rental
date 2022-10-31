@@ -1,67 +1,76 @@
 ﻿using System.Security.Claims;
+using System.Text.Json;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace MyRental.Blazor.Authentication;
 
 public class MyAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private readonly ProtectedSessionStorage _sessionStorage;
-    private ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
+    private readonly ILocalStorageService _localStorageService;
+    private ClaimsIdentity _identity = new();
+    private readonly NavigationManager _navManager;
 
-    public MyAuthenticationStateProvider(ProtectedSessionStorage sessionStorage)
+    public MyAuthenticationStateProvider(ILocalStorageService localStorageService, NavigationManager navManager)
     {
-        _sessionStorage = sessionStorage;
+        _localStorageService = localStorageService;
+        _navManager = navManager;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        try
+        var token = await _localStorageService.GetItemAsync<string>("Jwt");
+        
+        if (!string.IsNullOrEmpty(token))
         {
-            var userSessionStorageResult = await _sessionStorage.GetAsync<UserSession>("UserSession");
-            var session = userSessionStorageResult.Success ? userSessionStorageResult.Value : null;
-
-            if (session == null) return await Task.FromResult(new AuthenticationState(_anonymous));
-
-            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, session.Id + ""),
-                new(ClaimTypes.Name, session.UserName),
-                new(ClaimTypes.Email, session.Email),
-                new(ClaimTypes.MobilePhone, session.PhoneNumber),
-                new(ClaimTypes.Role, session.Role)
-            }, "CustomAuth"));
-
-            return await Task.FromResult(new AuthenticationState(claimsPrincipal));
+            _identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
         }
-        catch
-        {
-            return await Task.FromResult(new AuthenticationState(_anonymous));
-        }
+
+        var user = new ClaimsPrincipal(_identity);
+        var state = new AuthenticationState(user);
+
+        NotifyAuthenticationStateChanged(Task.FromResult(state));
+        
+        return state;
     }
 
-    public async Task UpdateAuthenticationStateAsync(UserSession session)
+    public async Task LogoutAsync()
     {
-        ClaimsPrincipal claims;
+        await _localStorageService.SetItemAsync<string>("Jwt", "");
+        await GetAuthenticationStateAsync();
+        _navManager.NavigateTo("/", true);
+    }
 
-        if (session != null)
+    private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+    {
+        var payload = jwt.Split('.')[1];
+        var jsonBytes = ParseBase64WithoutPadding(payload);
+        var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+        return keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()));
+    }
+
+    private static byte[] ParseBase64WithoutPadding(string base64)
+    {
+        switch (base64.Length % 4)
         {
-            await _sessionStorage.SetAsync("UserSession", session);
-            claims = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, session.Id + ""),
-                new(ClaimTypes.Name, session.UserName),
-                new(ClaimTypes.Email, session.Email),
-                new(ClaimTypes.MobilePhone, session.PhoneNumber),
-                new(ClaimTypes.Role, session.Role)
-            }, "CustomAuth"));
+            case 2: base64 += "=="; break;
+            case 3: base64 += "="; break;
         }
-        else
-        {
-            await _sessionStorage.DeleteAsync("UserSession");
-            claims = _anonymous;
-        }
+        return Convert.FromBase64String(base64);
+    }
+    
+    public UserSession GetUserSession()
+    {
+        var claims = _identity.Claims;
         
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claims)));
+        return new UserSession
+        {
+            Id = int.Parse(claims.ElementAt(0).Value),
+            UserName = claims.ElementAt(1).Value,
+            Email = claims.ElementAt(2).Value,
+            PhoneNumber = claims.ElementAt(3).Value,
+            Role = claims.ElementAt(4).Value
+        };
     }
 }

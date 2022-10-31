@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Ads.Dto;
-using MyRental.Services.Areas.Users.Services;
+using MyRental.Services.Areas.Users;
 
-namespace MyRental.Services.Areas.Ads.Services;
+namespace MyRental.Services.Areas.Ads;
 
 public class AdService : IAdService
 {

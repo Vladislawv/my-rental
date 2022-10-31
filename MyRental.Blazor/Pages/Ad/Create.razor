@@ -1,5 +1,5 @@
 ﻿@page "/ads/create/{UserId:int}"
-@using MyRental.Infrastructure.Entities
+
 @attribute [Authorize]
 
 @inject IJSRuntime Js
@@ -153,15 +153,17 @@
     public int UserId { get; set; }
     
     readonly AdDtoInput _adInput = new();
+    private int _adId;
+    
     List<string>? _countries;
-
     bool _isCityDisabled = true;
     List<string>? _cities;
+    
     int _currentMedia;
 
     protected override async Task OnInitializedAsync()
     {
-        _adInput.Medias = new List<MediaFile>();
+        _adInput.Medias = new List<MediaDtoInput>();
         await FindCountriesAsync();
 
         _currentMedia = 0;
@@ -177,18 +179,25 @@
             var result = await new AdDtoInputValidator().ValidateAsync(_adInput);
             if (!result.IsValid)
             {
-                var message = result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage);
+                var message = result.Errors
+                    .Aggregate("", (current, error) => current + error.ErrorMessage);
+                
                 throw new Exception(message);
             }
-            await AdService.CreateAsync(_adInput);
+            
+            _adId = await AdService.CreateAsync(_adInput);
+
+            foreach (var media in _adInput.Medias)
+            {
+                media.AdId = _adId;
+            }
+            
+            NavManager.NavigateTo($"/user/account");
         }
         catch (Exception e)
         {
             await Js.InvokeVoidAsync("alert", e.Message);
-            return;
         }
-        
-        NavManager.NavigateTo($"/user/account");
     }
     
     async Task OnFileChangeAsync(InputFileChangeEventArgs e)
@@ -201,9 +210,8 @@
 
         var nameAndExtension = e.File.Name.Split(".");
 
-        var file = new MediaFile
+        var file = new MediaDtoInput
         {
-            AdId = 180,
             Data = imageData,
             Name = nameAndExtension[0],
             Extension = nameAndExtension[1]

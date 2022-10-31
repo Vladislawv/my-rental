@@ -1,5 +1,7 @@
 ﻿@page "/auth/login"
 
+@inject IConfiguration Configuration
+@inject ILocalStorageService LocalStorageService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IUserService UserService
 @inject IJSRuntime Js
@@ -35,7 +37,7 @@
 @code
 {
     readonly LoginDto _login = new();
-    UserDto _user;
+    UserDto? _user;
 
     private async void LoginAsync()
     {
@@ -49,16 +51,36 @@
             return;
         }
 
-        var customStateProvider = (MyAuthenticationStateProvider)AuthStateProvider;
-        await customStateProvider.UpdateAuthenticationStateAsync(new UserSession
-        {
-            Id = _user.Id,
-            UserName = _user.UserName,
-            Email = _user.Email,
-            PhoneNumber = _user.PhoneNumber,
-            Role = await UserService.GetRoleNameByIdAsync(_user.Id)
-        });
+        var jwt = await GenerateJwtAsync(_user);
+        await LocalStorageService.SetItemAsync("Jwt", jwt);
+
+        await AuthStateProvider.GetAuthenticationStateAsync();
         
-        NavManager.NavigateTo($"/user/account", true);
+        NavManager.NavigateTo("/user/account", true);
+    }
+
+    private async Task<string> GenerateJwtAsync(UserDto user)
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id + ""),
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
+            new Claim(ClaimTypes.Role, await UserService.GetRoleNameByIdAsync(user.Id))
+        };
+        
+        var token = new JwtSecurityToken(
+            issuer: Configuration["Jwt:Issuer"],
+            audience: Configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(40),
+            notBefore: DateTime.UtcNow,
+            signingCredentials: new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                SecurityAlgorithms.HmacSha256)
+            );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

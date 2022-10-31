@@ -1,25 +1,27 @@
+using System.Text;
+using Blazored.LocalStorage;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MyRental.Blazor.Authentication;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
-using MyRental.Services.Areas.Ads.Services;
-using MyRental.Services.Areas.Medias.Services;
-using MyRental.Services.Areas.Users.Services;
+using MyRental.Services.Areas.Ads;
+using MyRental.Services.Areas.Medias;
+using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, MyAuthenticationStateProvider>();
+builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddFluentValidation(configuration =>
     configuration.RegisterValidatorsFromAssembly(typeof(ValidationRuleBuilderExtensions).Assembly));
@@ -33,7 +35,22 @@ builder.Services.AddIdentity<User, Role>()
 
 builder.Services.AddAutoMapper(typeof(EntityDto));
 
-builder.Services.AddAuthentication();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateActor = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+        
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddTransient<ISeeder<Role>, RolesSeeder>();

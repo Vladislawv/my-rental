@@ -15,7 +15,8 @@ public class AdDtoInputValidator : AbstractValidator<AdDtoInput>
         
         RuleFor(ad => ad.Area).NotEmpty();
 
-        RuleFor(ad => ad.Title).Length(5, 60);
+        RuleFor(ad => ad.Title).NotEmpty()
+            .Length(5, 60);
         
         RuleFor(ad => ad.Rooms).NotEmpty();
         
@@ -23,6 +24,7 @@ public class AdDtoInputValidator : AbstractValidator<AdDtoInput>
         
         RuleFor(ad => ad.Price).NotEmpty();
         
-        RuleFor(ad => ad.Description).Length(10, 250);
+        RuleFor(ad => ad.Description).NotEmpty()
+            .Length(10, 250);
     }
 }

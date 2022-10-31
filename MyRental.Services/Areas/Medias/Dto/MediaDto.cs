@@ -2,7 +2,6 @@
 
 public class MediaDto : EntityDto
 {
-    public int Id { get; set; }
     public int AdId { get; set; }
     public string Data { get; set; }
     public string Name { get; set; }

@@ -1,6 +1,6 @@
 ﻿using MyRental.Services.Areas.Ads.Dto;
 
-namespace MyRental.Services.Areas.Ads.Services;
+namespace MyRental.Services.Areas.Ads;
 
 public interface IAdService
 {

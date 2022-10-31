@@ -1,7 +1,8 @@
 ﻿@page "/user/account"
+
 @attribute [Authorize]
 
-@inject ProtectedSessionStorage SessionStorage
+@inject AuthenticationStateProvider AuthProvider
 @inject IJSRuntime Js
 @inject IUserService UserService
 @inject IAdService AdService
@@ -77,15 +78,21 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var userSessionStorageResult = await SessionStorage.GetAsync<UserSession>("UserSession");
-        var session = userSessionStorageResult.Success ? userSessionStorageResult.Value : null;
+        var myProvider = (MyAuthenticationStateProvider)AuthProvider;
+        _userId = myProvider.GetUserSession().Id;
 
-        if (session != null)
+        try
         {
-            _userId = session.Id;
             _user = await UserService.GetByIdAsync(_userId);
-            _ads = await AdService.GetUserListAsync(_userId);
         }
+        catch
+        {
+            await Js.InvokeVoidAsync("alert", "User not found");
+
+            await myProvider.LogoutAsync();
+        }
+        
+        _ads = await AdService.GetUserListAsync(_userId);
     }
 
     private async Task DeleteAdByIdAsync(int id)

@@ -5,7 +5,7 @@ using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Medias.Dto;
 
-namespace MyRental.Services.Areas.Medias.Services;
+namespace MyRental.Services.Areas.Medias;
 
 public class MediaService : IMediaService
 {

@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.Areas.Users.Services;
 
 namespace MyRental.Api.Controllers;
 
