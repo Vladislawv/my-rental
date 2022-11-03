@@ -1,0 +1,94 @@
+﻿@page "/user/edit/{Id:int}"
+
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider AuthProvider
+@inject IJSRuntime Js
+@inject NavigationManager NavManager
+@inject IMapper Mapper
+@inject IUserService UserService
+
+<PageTitle>Edit data</PageTitle>
+
+<div class="text-primary text-center">
+    <h1>Edit personal information</h1>
+
+    <br/>
+    <br/>
+
+    @if (string.IsNullOrEmpty(_userInput.Role))
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else{
+        <EditForm Model="_userInput">
+             <div>
+                 <label for="UserName">Name</label>
+                 <InputText class="form-control" id="UserName" @bind-Value="_userInput.UserName"></InputText>
+             </div>
+             <div>
+                 <label for="Email">Email</label>
+                 <InputText class="form-control" id="Email" @bind-Value="_userInput.Email"></InputText>
+             </div>
+             <div>
+                 <label for="PhoneNumber">Phone</label>
+                 <InputText class="form-control" id="PhoneNumber" @bind-Value="_userInput.PhoneNumber"></InputText>
+             </div>
+             <div>
+                 <label>Password</label>
+                 <InputText class="form-control" id="Password" @bind-Value="_userInput.Password"></InputText>
+             </div>
+             <br/>
+             <br/>
+
+             <button class="btn btn-info auto-width"><a href="/user/account"><i class="bi bi-arrow-bar-left"></i></a></button>
+             <button class="btn btn-primary auto-width" @onclick="UpdateAsync"><i class="bi bi-pencil-square"></i></button>
+         </EditForm>}
+</div>
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    readonly UserDtoInput _userInput = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserService.GetByIdAsync(Id);
+        Mapper.Map(user, _userInput);
+
+        var myProvider = (MyAuthenticationStateProvider)AuthProvider;
+        var userSession = myProvider.GetUserSession();
+
+        _userInput.Role = userSession.Role;
+    }
+
+    private async Task UpdateAsync()
+    {
+        try
+        {
+            var result = await new UserDtoInputValidator(UserService)
+                .ValidateAsync(_userInput);
+            
+            if (!result.IsValid)
+            {
+                var message = result.Errors
+                    .Aggregate("", (current, error) => current + error.ErrorMessage);
+                
+                throw new Exception(message);
+            }
+            
+            await UserService.UpdateByIdAsync(Id, _userInput);
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+            return;
+        }
+
+        NavManager.NavigateTo("/user/account");
+    }
+}

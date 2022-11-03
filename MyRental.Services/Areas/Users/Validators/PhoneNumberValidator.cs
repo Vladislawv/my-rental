@@ -2,7 +2,7 @@
 using FluentValidation;
 using FluentValidation.Validators;
 
-namespace MyRental.Services.Validators;
+namespace MyRental.Services.Areas.Users.Validators;
 
 public class PhoneNumberValidator<T> : PropertyValidator<T, string>
 {

@@ -1,0 +1,76 @@
+﻿@page "/auth/sign-up"
+
+@inject IJSRuntime Js
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Sign Up</PageTitle>
+
+<div class="text-center">
+    <h1>Sign Up</h1>
+    <h4>It takes a minute</h4>
+    <br/>
+    
+    <EditForm Model="_userInput">
+        <div>
+            <label for="UserName">Name</label>
+            <InputText class="form-control" id="UserName" @bind-Value="_userInput.UserName"></InputText>
+        </div>
+        <div>
+            <label for="Email">Email</label>
+            <InputText class="form-control" id="Email" @bind-Value="_userInput.Email"></InputText>
+        </div>
+        <div>
+            <label for="PhoneNumber">Phone</label>
+            <InputText class="form-control" id="PhoneNumber" @bind-Value="_userInput.PhoneNumber"></InputText>
+        </div>
+        <div>
+            <label for="Password">Password</label>
+            <InputText class="form-control" id="Password" @bind-Value="_userInput.Password"></InputText>
+        </div>
+        <div>
+            <label for="Role">Role</label>
+            <InputSelect class="form-select" id="Role" @bind-Value="_userInput.Role">
+                <option value="">Choose your role</option>
+                <option value="Tenant">Tenant</option>
+                <option value="Landlord">Landlord</option>
+                <option value="Realtor">Realtor</option>
+            </InputSelect>
+        </div>
+    </EditForm>
+    <br/>
+    <br/>
+    
+    <button class="btn btn-info auto-width"><a href="/"><i class="bi bi-arrow-bar-left"></i></a></button>
+    <button class="btn btn-success auto-width" @onclick="SignUpAsync"><i class="bi bi-check-square"></i></button>
+    <br/>
+    <br/>
+    
+    <p>Already have an account? <a href="/auth/login">Login here</a></p>
+</div>
+
+@code
+{
+    readonly UserDtoInput _userInput = new();
+    
+    private async void SignUpAsync()
+    {
+        try
+        {
+            var result = await new UserDtoInputValidator(UserService).ValidateAsync(_userInput);
+            if (!result.IsValid)
+            {
+                var message = result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage);
+                throw new Exception(message);
+            }
+            await UserService.CreateAsync(_userInput);
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+            return;
+        }
+        
+        NavigationManager.NavigateTo("/auth/login");
+    }
+}

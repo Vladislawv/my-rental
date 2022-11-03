@@ -5,8 +5,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.UserService;
 
 namespace MyRental.Api.Controllers;
 
@@ -19,15 +19,19 @@ namespace MyRental.Api.Controllers;
 [AllowAnonymous]
 public class AuthController : ControllerBase
 {
+    private readonly IConfiguration _configuration;
     private readonly IUserService _userService;
 
     /// <summary>
     /// Constructor
     /// </summary>
+    /// <param name="configuration"></param>
     /// <param name="userService"></param>
-    public AuthController(IUserService userService)
+    public AuthController(IConfiguration configuration, IUserService userService)
     {
+        _configuration = configuration;
         _userService = userService;
+        
     }
 
     /// <summary>
@@ -38,10 +42,15 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> RegisterAsync([FromBody] UserDtoInput userInput)
     {
-        var userId = await _userService.CreateAsync(userInput);
-        var user = await _userService.GetByIdAsync(userId);
-        
-        return Ok(user);
+        await _userService.CreateAsync(userInput);
+
+        var login = new LoginDto
+        {
+            Email = userInput.Email,
+            Password = userInput.Password
+        };
+
+        return await LoginAsync(login);
     }
     
     
@@ -58,18 +67,21 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, loggedInUser.UserName),
+            new Claim(ClaimTypes.NameIdentifier, loggedInUser.Id + ""),
+            new Claim(ClaimTypes.Name, loggedInUser.UserName),
+            new Claim(ClaimTypes.Email, loggedInUser.Email),
+            new Claim(ClaimTypes.MobilePhone, loggedInUser.PhoneNumber),
             new Claim(ClaimTypes.Role, await _userService.GetRoleNameByIdAsync(loggedInUser.Id))
         };
         
         var token = new JwtSecurityToken(
-            issuer: "https://localhost:5000/",
-            audience: "https://localhost:5000/",
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(40),
             notBefore: DateTime.UtcNow,
             signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes("DPdfspdisdfsdsf8uds8u32ADSdas23fs8d4")),
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
                 SecurityAlgorithms.HmacSha256)
         );
         

@@ -1,0 +1,86 @@
+﻿@page "/auth/login"
+
+@inject IConfiguration Configuration
+@inject ILocalStorageService LocalStorageService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserService UserService
+@inject IJSRuntime Js
+@inject NavigationManager NavManager
+
+<PageTitle>Login</PageTitle>
+
+<div class="text-center">
+    <h1>Login</h1>
+    <br/>
+    
+    <EditForm Model="_login">
+        <div>
+            <label for="Login">Email</label>
+            <InputText class="form-control" id="Login" @bind-Value="_login.Email"></InputText>
+        </div>
+        <div>
+            <label for="Password">Password</label>
+            <InputText class="form-control" id="Password" @bind-Value="_login.Password"></InputText>
+        </div>
+    </EditForm>
+    <br/>
+    <br/>
+    
+    <button class="btn btn-info auto-width"><a href="/"><i class="bi bi-arrow-bar-left"></i></a></button>
+    <button class="btn btn-success auto-width" @onclick="LoginAsync"><i class="bi bi-check-square"></i></button>
+    <br/>
+    <br/>
+    
+    <p>Don`t have an account? <a href="/auth/sign-up">Sign up here</a></p>
+</div>
+
+@code
+{
+    readonly LoginDto _login = new();
+    UserDto? _user;
+
+    private async void LoginAsync()
+    {
+        try
+        {
+            _user = await UserService.GetByLoginAsync(_login);
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+            return;
+        }
+
+        var jwt = await GenerateJwtAsync(_user);
+        await LocalStorageService.SetItemAsync("Jwt", jwt);
+
+        await AuthStateProvider.GetAuthenticationStateAsync();
+        
+        NavManager.NavigateTo("/user/account", true);
+    }
+
+    private async Task<string> GenerateJwtAsync(UserDto user)
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id + ""),
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
+            new Claim(ClaimTypes.Role, await UserService.GetRoleNameByIdAsync(user.Id))
+        };
+        
+        var token = new JwtSecurityToken(
+            issuer: Configuration["Jwt:Issuer"],
+            audience: Configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(40),
+            notBefore: DateTime.UtcNow,
+            signingCredentials: new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                SecurityAlgorithms.HmacSha256)
+            );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+}

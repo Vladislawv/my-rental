@@ -1,0 +1,93 @@
+﻿@page "/"
+
+@inject NavigationManager NavManager
+
+<PageTitle>Main</PageTitle>
+
+<div>
+    <h1>Here You can find or sell your house.</h1>
+    <h2>Choose the search area</h2>
+</div>
+
+<div class="text-center">
+    <EditForm Model="_filter">
+        <div>
+            <label for="Country">Country</label>
+            <InputSelect class="form-select" id="Country" @bind-Value="_filter.Country" @oninput="InitCitiesByCountry">
+            
+                @if (_countries == null)
+                {
+                    <option value="">Choose country</option>
+                }
+                else
+                {
+                    <option value="">Countries</option>
+                    foreach (var country in _countries)
+                    {
+                        <option value="@country">@country</option>
+                    }
+                }
+            </InputSelect>
+        </div>
+        <div>
+            <label for="City">City</label>
+            <InputSelect class="form-select" id="City" @bind-Value="_filter.City" disabled="@_isCityDisabled">
+                @if (_isCityDisabled)
+                {
+                    <option value="">Choose country</option>
+                }
+                else
+                {
+                    <option value="">Cities</option>
+                    @foreach (var city in _cities)
+                    {
+                        <option value="@city">@city</option>       
+                    }
+                }
+            </InputSelect>
+        </div>
+        <br/>
+        <br/>
+        <button class="btn btn-success" @onclick="Find"><i class="bi bi-search"></i></button>
+        <br/>
+        <br/>
+    </EditForm>
+</div>
+
+@code
+{
+    List<string>? _countries;
+    
+    List<string>? _cities;
+    bool _isCityDisabled = true;
+    
+    readonly FilterDtoInput _filter = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitCountriesAsync();
+    }
+
+    private void Find()
+    {
+        NavManager.NavigateTo($"/ads?Country={_filter.Country}&City={_filter.City}");
+    }
+    
+    private async Task InitCountriesAsync()
+    {
+        var countries = await File.ReadAllLinesAsync("D:\\Programming\\Projects\\my-rental\\MyRental.Infrastructure\\Enums\\Countries.txt");
+        _countries = countries.ToList();
+    }
+
+    private void InitCitiesByCountry(ChangeEventArgs e)
+    {
+        _filter.City = "";
+        _isCityDisabled = e.Value.Equals("");
+        if (_isCityDisabled) return;
+
+        _cities = File.ReadLines("D:\\Programming\\Projects\\my-rental\\MyRental.Infrastructure\\Enums\\Cities.txt")
+            .Where(city => city.EndsWith($"{e.Value}"))
+            .OrderBy(city => city[0])
+            .ToList();
+    }
+}

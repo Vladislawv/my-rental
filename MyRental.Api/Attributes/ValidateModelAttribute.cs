@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
+using MyRental.Services.Areas.Ads.Dto;
+using MyRental.Services.Areas.Ads.Validators;
+using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.UserService;
-using MyRental.Services.Validators;
+using MyRental.Services.Areas.Users.Validators;
 
 namespace MyRental.Api.Attributes;
 
@@ -34,6 +36,14 @@ public class ValidateModelAttribute : ActionFilterAttribute
                 ?? throw new Exception("The input is empty!"));
 
             await new UserDtoInputValidator(_userService).ValidateAsync(userInput);
+        }
+
+        if (context.ActionArguments.ContainsKey("adInput"))
+        {
+            var adInput = (AdDtoInput)(context.ActionArguments["adInput"]
+                ?? throw new Exception("The input is empty!"));
+
+            await new AdDtoInputValidator().ValidateAsync(adInput);
         }
 
         await next.Invoke();

@@ -5,17 +5,29 @@ using MyRental.Api.Dto;
 
 namespace MyRental.Api.Middlewares;
 
+/// <summary>
+/// Class to handle exceptions
+/// </summary>
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlerMiddleware> _logger;
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="next"></param>
+    /// <param name="logger"></param>
     public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
     {
         _next = next;
         _logger = logger;
     }
 
+    /// <summary>
+    /// Handle exception and write response
+    /// </summary>
+    /// <param name="context"></param>
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -41,8 +53,6 @@ public class ExceptionHandlingMiddleware
             ErrorMessage = ex.Message
         };
 
-        var result = JsonSerializer.Serialize(errorDto, new JsonSerializerOptions(JsonSerializerDefaults.Web));
-
-        await response.WriteAsync(result);
+        await response.WriteAsJsonAsync(errorDto, new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
 }

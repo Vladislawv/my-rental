@@ -1,0 +1,112 @@
+﻿@page "/user/account"
+
+@attribute [Authorize]
+
+@inject AuthenticationStateProvider AuthProvider
+@inject IJSRuntime Js
+@inject IUserService UserService
+@inject IAdService AdService
+
+<PageTitle>Account page</PageTitle>
+
+@if (_user == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <br/>
+    <div class="text-start">
+        <h2 class="text-start">Here is your personal data:
+            <button class="btn btn-primary auto-width"><a href="/user/edit/@_userId"><i class="bi bi-pencil-square"></i></a></button>
+        </h2>
+        <br/>
+
+        <ul class="text-primary">
+            <li>
+                <h3 class="text-start">Name: @_user.UserName</h3></li>
+            <li>
+                <h3 class="text-start">Email: @_user.Email</h3></li>
+            <li>
+                <h3 class="text-start">Number: @_user.PhoneNumber</h3></li>
+        </ul>
+
+        <div class="row pt-4">
+            <div class="col-6 text-primary">
+                <h2 class="text-start">Your ads</h2>
+            </div>
+            <div class="col-6 text-end">
+                <button style="width: 40px" class="btn btn-success"><a href="/ads/create/@_userId"><i class="bi bi-plus-circle"></i></a></button>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>Area</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var ad in _ads)
+            {
+                <tr>
+                    <td>@ad.Area</td>
+                    <td>@ad.Title</td>
+                    <td>@ad.Price</td>
+                    <td><button class="btn btn-info auto-width"><a href="/ads/@ad.Id"><i class="bi bi-three-dots"></i></a></button></td>
+                    <td><button class="btn btn-primary auto-width"><a href="/ads/edit/@_userId/@ad.Id"><i class="bi bi-pencil-square"></i></a></button></td>
+                    <td><button class="btn btn-danger auto-width" @onclick="() => DeleteAdByIdAsync(ad.Id)"><i class="bi bi-trash-fill"></i></button></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code
+{
+    int _userId;
+    UserDto? _user;
+    IList<AdDto>? _ads;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var myProvider = (MyAuthenticationStateProvider)AuthProvider;
+        _userId = myProvider.GetUserSession().Id;
+
+        try
+        {
+            _user = await UserService.GetByIdAsync(_userId);
+        }
+        catch
+        {
+            await Js.InvokeVoidAsync("alert", "User not found");
+
+            await myProvider.LogoutAsync();
+        }
+        
+        _ads = await AdService.GetUserListAsync(_userId);
+    }
+
+    private async Task DeleteAdByIdAsync(int id)
+    {
+        try
+        {
+            await AdService.DeleteByIdAsync(id);
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+            return;
+        }
+        
+        await OnInitializedAsync();
+    }
+}
