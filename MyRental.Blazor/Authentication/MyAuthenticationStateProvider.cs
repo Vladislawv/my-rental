@@ -22,9 +22,9 @@ public class MyAuthenticationStateProvider : AuthenticationStateProvider
     {
         var token = await _localStorageService.GetItemAsync<string>("Jwt");
         
-        if (!string.IsNullOrEmpty(token))
+        if (token != null)
         {
-            _identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
+            _identity = new ClaimsIdentity(await ParseClaimsFromJwtAsync(token), "jwt");
         }
 
         var user = new ClaimsPrincipal(_identity);
@@ -37,17 +37,25 @@ public class MyAuthenticationStateProvider : AuthenticationStateProvider
 
     public async Task LogoutAsync()
     {
-        await _localStorageService.SetItemAsync<string>("Jwt", "");
+        await _localStorageService.RemoveItemAsync("Jwt");
         await GetAuthenticationStateAsync();
         _navManager.NavigateTo("/", true);
     }
 
-    private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+    private async Task<IEnumerable<Claim>?> ParseClaimsFromJwtAsync(string jwt)
     {
-        var payload = jwt.Split('.')[1];
-        var jsonBytes = ParseBase64WithoutPadding(payload);
-        var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
-        return keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()));
+        try
+        {
+            var payload = jwt.Split('.')[1];
+            var jsonBytes = ParseBase64WithoutPadding(payload);
+            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+            return keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()));
+        }
+        catch
+        {
+            await LogoutAsync();
+            return null;
+        }
     }
 
     private static byte[] ParseBase64WithoutPadding(string base64)

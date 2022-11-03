@@ -63,7 +63,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginDto login)
     {
-        var loggedInUser = await _userService.GetByLoginAsync(login);
+        var loggedInUser = await _userService
+            .GetByLoginAsync(login);
 
         var claims = new[]
         {
