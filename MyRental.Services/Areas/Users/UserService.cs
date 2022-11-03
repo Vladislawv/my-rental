@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Users.Dto;
 using MyRental.Services.Handlers;
@@ -10,11 +11,13 @@ namespace MyRental.Services.Areas.Users;
 
 public class UserService : IUserService
 {
+    private readonly MyRentalContext _context;
     private readonly UserManager<User> _userManager;
     private readonly IMapper _mapper;
 
-    public UserService(UserManager<User> userManager, IMapper mapper)
+    public UserService(MyRentalContext context, UserManager<User> userManager, IMapper mapper)
     {
+        _context = context;
         _userManager = userManager;
         _mapper = mapper;
     }
@@ -94,6 +97,28 @@ public class UserService : IUserService
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
+    }
+
+    public async Task SubscribeToNotificationsAsync(string email)
+    {
+        var mail = new Mail { Email = email };
+
+        await _context.Mailing
+            .AddAsync(mail);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UnsubscribeFromNotificationsAsync(string email)
+    {
+        var mail = await _context.Mailing
+            .FirstOrDefaultAsync(mail => mail.Email == email)
+                ?? throw new Exception("Email is not found.");
+
+        _context.Mailing
+            .Remove(mail);
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task<string> GetRoleNameByIdAsync(int id)
