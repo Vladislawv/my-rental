@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net;
+using System.Net.Mail;
+using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
+using MyRental.Services.Areas.Notifications.Data;
 
 namespace MyRental.Services.Areas.Notifications;
 
@@ -11,6 +14,48 @@ public class NotificationService : INotificationService
     public NotificationService(MyRentalContext context)
     {
         _context = context;
+    }
+
+    public async Task<IList<string>> GetListAsync()
+    {
+        var list = await _context.Mailing
+            .Select(mail => mail.Email)
+            .ToListAsync();
+
+        return list;
+    }
+
+    public async Task NotifyAsync(Letter letter)
+    {
+        var client = new SmtpClient
+        {
+            Host = "smtp.gmail.com",
+            Port = 587,
+            EnableSsl = true,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            UseDefaultCredentials = false,
+            Credentials = new NetworkCredential
+            {
+                UserName = "vladusupov2810@gmail.com",
+                Password = "mcgqcsljtuezklbx"
+            }
+        };
+    
+        var from = new MailAddress("vladusupov2810@gmail.com", "MyRental");
+        
+        var message = new MailMessage
+        {
+            From = from,
+            Subject = letter.Title,
+            Body = letter.Message
+        };
+        
+        foreach (var email in await GetListAsync())
+        {
+            message.To.Add(new MailAddress(email, "to"));
+        }
+        
+        await client.SendMailAsync(message);
     }
 
     public async Task SubscribeToNotificationsAsync(string email)

@@ -1,0 +1,46 @@
+﻿@page "/admin"
+
+@inject IJSRuntime Js
+@inject INotificationService NotificationService
+
+<PageTitle>Admin page</PageTitle>
+
+<h2>Here you can mailing to all users that subscribe to notifications</h2>
+
+<EditForm Model="_letter">
+    <table class="table-hover w-100">
+        <thead>
+        <tr>
+            <th>
+                <div>
+                    <label for="Title">Title</label>
+                    <InputTextArea class="form-control w-100" id="Title" @bind-Value="_letter.Title"></InputTextArea>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <label for="Message">Message</label>
+                    <InputTextArea class="form-control w-100" id="Message" @bind-Value="_letter.Message"></InputTextArea>
+                </div>
+            </th>
+        </tr>
+        </thead>
+    </table>
+    <br/>
+    <br/>
+
+    <div class="text-center">
+        <button class="btn btn-info auto-width" @onclick="NotifyAsync"><i class="bi bi-send"></i></button>
+    </div>
+</EditForm>
+
+@code
+{
+    readonly Letter _letter = new();
+
+    private async Task NotifyAsync()
+    {
+        await NotificationService.NotifyAsync(_letter);
+        await Js.InvokeVoidAsync("alert", "Successfully!");
+    }
+}
