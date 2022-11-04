@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using MyRental.Services.Areas.Ads.Dto;
 using MyRental.Services.Areas.Ads.Validators;
+using MyRental.Services.Areas.Notifications.Validators;
 using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Dto;
 using MyRental.Services.Areas.Users.Validators;
@@ -32,18 +33,32 @@ public class ValidateModelAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         if (context.ActionArguments.ContainsKey("userInput")) {
-            var userInput = (UserDtoInput)(context.ActionArguments["userInput"] 
-                ?? throw new Exception("The input is empty!"));
+            var userInput = (UserDtoInput)(context
+                .ActionArguments["userInput"] 
+                    ?? throw new Exception("The input is empty!"));
 
-            await new UserDtoInputValidator(_userService).ValidateAsync(userInput);
+            await new UserDtoInputValidator(_userService)
+                .ValidateAsync(userInput);
         }
 
         if (context.ActionArguments.ContainsKey("adInput"))
         {
-            var adInput = (AdDtoInput)(context.ActionArguments["adInput"]
-                ?? throw new Exception("The input is empty!"));
+            var adInput = (AdDtoInput)(context
+                .ActionArguments["adInput"]
+                    ?? throw new Exception("The input is empty!"));
 
-            await new AdDtoInputValidator().ValidateAsync(adInput);
+            await new AdDtoInputValidator()
+                .ValidateAsync(adInput);
+        }
+
+        if (context.ActionArguments.ContainsKey("email"))
+        {
+            var email = (string)(context
+                .ActionArguments["email"]
+                    ?? throw new Exception("The input is empty!"));
+
+            await new EmailValidator()
+                .ValidateAsync(email);
         }
 
         await next.Invoke();

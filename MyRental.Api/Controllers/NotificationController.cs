@@ -1,6 +1,6 @@
 ﻿using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
-using MyRental.Services.Areas.Users;
+using MyRental.Services.Areas.Notifications;
 
 namespace MyRental.Api.Controllers;
 
@@ -12,15 +12,15 @@ namespace MyRental.Api.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class NotificationController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly INotificationService _notificationService;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="userService"></param>
-    public NotificationController(IUserService userService)
+    /// <param name="notificationService"></param>
+    public NotificationController(INotificationService notificationService)
     {
-        _userService = userService;
+        _notificationService = notificationService;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class NotificationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SubscribeToNotificationsAsync([FromBody] string email)
     {
-        await _userService.SubscribeToNotificationsAsync(email);
+        await _notificationService.SubscribeToNotificationsAsync(email);
 
         return Ok();
     }
@@ -46,7 +46,7 @@ public class NotificationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> UnsubscribeFromNotificationsAsync([FromBody] string email)
     {
-        await _userService.UnsubscribeFromNotificationsAsync(email);
+        await _notificationService.UnsubscribeFromNotificationsAsync(email);
 
         return Ok();
     }
