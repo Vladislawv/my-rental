@@ -94,7 +94,8 @@
     }
 }
 
-body {
+html, body {
+    height: 100%;
     margin: 0;
     font-family: var(--bs-body-font-family);
     font-size: var(--bs-body-font-size);
@@ -105,6 +106,22 @@ body {
     background-color: var(--bs-body-bg);
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.wrapper{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+main{
+    flex: 1 0 auto;
+}
+
+footer{
+    margin-top: 30px;
+    flex: 0 0 auto;
+    background: #006375;
 }
 
 hr {
@@ -2282,6 +2299,9 @@ textarea.form-control-lg {
 }
 
 .form-check {
+    height: 20px;
+    width: 20px;
+    margin: 0 auto;
     display: block;
     min-height: 1.5rem;
     padding-left: 1.5em;

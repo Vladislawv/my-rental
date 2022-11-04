@@ -3,51 +3,80 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject IJSRuntime Js
 @inject NavigationManager NavManager
+@inject INotificationService NotificationService
 
 <PageTitle>MyRental.Blazor</PageTitle>
 
-<header>
-    <a href="/"><img src="images/MR.png" alt="My Rental" width="90" height="90"/></a>
-    <ul>
-        <AuthorizeView Roles="Admin">
-            <li><a href="/admin"><i class="bi bi-laptop"></i>Admin</a></li>
-        </AuthorizeView>
-        
-        <AuthorizeView>
-            <Authorized>
-                <li><a href="/user/account"><i class="bi bi-house-fill"></i>Account</a></li>
-                <li><a @onclick="Logout" href="javascript:void(0)"><i class="bi bi-door-closed-fill"></i>Logout</a></li>
-            </Authorized>
-
-            <NotAuthorized>
-                <li><a href="/auth/sign-up"><i class="bi bi-door-open"></i>Register</a></li>
-                <li><a href="/auth/login"><i class="bi bi-door-open"></i>Login</a></li>
-            </NotAuthorized>
-        </AuthorizeView>
-    </ul>
-</header>
-
-<main>
-    <article class="content px-4">
-        <ErrorBoundary>
-            <ChildContent>
-                @Body
-            </ChildContent>
-            <ErrorContent>
-                @HandleException();
-            </ErrorContent>
-        </ErrorBoundary>
-    </article>
-</main>
+<div class="wrapper">
+    <header>
+        <a href="/"><img src="images/MR.png" alt="My Rental" width="90" height="90"/></a>
+        <ul>
+            <AuthorizeView Roles="Admin">
+                <li><a href="/admin"><i class="bi bi-laptop"></i>Admin</a></li>
+            </AuthorizeView>
+            
+            <AuthorizeView>
+                <Authorized>
+                    <li><a href="/user/account"><i class="bi bi-house-fill"></i>Account</a></li>
+                    <li><a @onclick="Logout" href="javascript:void(0)"><i class="bi bi-door-closed-fill"></i>Logout</a></li>
+                </Authorized>
+    
+                <NotAuthorized>
+                    <li><a href="/auth/register"><i class="bi bi-door-open"></i>Register</a></li>
+                    <li><a href="/auth/login"><i class="bi bi-door-open"></i>Login</a></li>
+                </NotAuthorized>
+            </AuthorizeView>
+        </ul>
+    </header>
+    
+    <main>
+        <article class="content px-4">
+            <ErrorBoundary>
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent>
+                    @HandleExceptionAsync();
+                </ErrorContent>
+            </ErrorBoundary>
+        </article>
+    </main>
+    
+    <footer class="text-center">
+        <EditForm class="mb-5" Model="_email">
+            <h3>Do you wanna subscribe to our newsletter?</h3>
+            <div>
+                <h4>Write your email here</h4>
+                <InputText class="form-control" id="Email" @bind-Value="_email"></InputText>
+                <button class="btn btn-success" @onclick="SubscribeToNotificationsAsync">Subscribe</button>
+            </div>
+        </EditForm>
+    </footer>
+</div>
 
 @code{
+    string _email = "";
+
+    private async Task SubscribeToNotificationsAsync()
+    {
+        try
+        {
+            await NotificationService.SubscribeToNotificationsAsync(_email);
+            await Js.InvokeVoidAsync("alert", "Successfully!");
+        }
+        catch
+        {
+            await HandleExceptionAsync();
+        }
+    }
+    
     private async Task Logout()
     {
         var myProvider = (MyAuthenticationStateProvider)AuthProvider;
         await myProvider.LogoutAsync();
     }
 
-    private async Task HandleException()
+    private async Task HandleExceptionAsync()
     {
         await Js.InvokeVoidAsync("alert", "Sorry, something went wrong.");
         NavManager.NavigateTo("/", forceLoad: true);
