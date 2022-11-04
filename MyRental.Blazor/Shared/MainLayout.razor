@@ -61,6 +61,11 @@
     {
         try
         {
+            var result = await new EmailValidator()
+                .ValidateAsync(_email);
+            
+            if (!result.IsValid) throw new Exception("Invalid email");
+            
             await NotificationService.SubscribeToNotificationsAsync(_email);
             await Js.InvokeVoidAsync("alert", "Successfully!");
         }
