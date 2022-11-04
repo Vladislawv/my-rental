@@ -1,7 +1,11 @@
-﻿namespace MyRental.Services.Areas.Notifications;
+﻿using MyRental.Services.Areas.Notifications.Data;
+
+namespace MyRental.Services.Areas.Notifications;
 
 public interface INotificationService
 {
+    public Task<IList<string>> GetListAsync();
+    public Task NotifyAsync(Letter letter);
     public Task SubscribeToNotificationsAsync(string email);
     public Task UnsubscribeFromNotificationsAsync(string email);
 }

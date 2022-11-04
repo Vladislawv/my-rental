@@ -13,6 +13,7 @@ using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
 using MyRental.Services.Areas.Ads;
 using MyRental.Services.Areas.Medias;
+using MyRental.Services.Areas.Notifications;
 using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Validators;
 
@@ -60,6 +61,8 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAdService, AdService>();
 
 builder.Services.AddTransient<IMediaService, MediaService>();
+
+builder.Services.AddTransient<INotificationService, NotificationService>();
 
 var app = builder.Build();
 

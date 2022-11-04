@@ -1,6 +1,9 @@
 ﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyRental.Services.Areas.Notifications;
+using MyRental.Services.Areas.Notifications.Data;
 
 namespace MyRental.Api.Controllers;
 
@@ -23,6 +26,35 @@ public class NotificationController : ControllerBase
         _notificationService = notificationService;
     }
 
+    /// <summary>
+    /// Get list of subscribed emails
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(IList<string>), StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    public async Task<IActionResult> GetListAsync()
+    {
+        var list = await _notificationService.GetListAsync();
+
+        return Ok(list);
+    }
+
+    /// <summary>
+    /// Notify subscribed emails
+    /// </summary>
+    /// <param name="letter"></param>
+    /// <returns></returns>
+    [HttpPost("send")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    public async Task<IActionResult> NotifyAsync([FromBody] Letter letter)
+    {
+        await _notificationService.NotifyAsync(letter);
+
+        return Ok();
+    }
+    
     /// <summary>
     /// Subscribe to notifications
     /// </summary>
