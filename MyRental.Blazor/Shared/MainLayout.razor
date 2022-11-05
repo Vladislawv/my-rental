@@ -9,7 +9,7 @@
 
 <div class="wrapper">
     <header>
-        <a href="/"><img src="images/MR.png" alt="My Rental" width="90" height="90"/></a>
+        <a href="/"><img src="images/logo.png" alt="My Rental" width="90" height="90"/></a>
         <ul>
             <AuthorizeView Roles="Admin">
                 <li><a href="/admin"><i class="bi bi-laptop"></i>Admin</a></li>
@@ -43,19 +43,25 @@
     </main>
     
     <footer class="text-center">
-        <EditForm class="mb-5" Model="_email">
-            <h3>Do you wanna subscribe to our newsletter?</h3>
-            <div>
-                <h4>Write your email here</h4>
-                <InputText class="form-control" id="Email" @bind-Value="_email"></InputText>
-                <button class="btn btn-success" @onclick="SubscribeToNotificationsAsync">Subscribe</button>
-            </div>
-        </EditForm>
+        <h2>Subscribe to newsletter
+            <button class="btn btn-info" @onclick="SetFooter"><i class="@GetIconClass()"></i></button>
+        </h2>
+
+        <div class="@GetFooterClass()">
+            <EditForm class="mb-5" Model="_email">
+                <div>
+                    <h4>Write your email here</h4>
+                    <InputText class="form-control" id="Email" @bind-Value="_email"></InputText>
+                    <button class="btn btn-success" @onclick="SubscribeToNotificationsAsync">Subscribe</button>
+                </div>
+            </EditForm>
+        </div>
     </footer>
 </div>
 
 @code{
     string _email = "";
+    bool _isFooterShow;
 
     private async Task SubscribeToNotificationsAsync()
     {
@@ -74,6 +80,12 @@
             await HandleExceptionAsync();
         }
     }
+    
+    private void SetFooter() => _isFooterShow = !_isFooterShow;
+    
+    private string GetIconClass() => _isFooterShow ? "bi bi-arrow-up" : "bi bi-arrow-down";
+
+    private string GetFooterClass() => _isFooterShow ? "show" : "hidden";
     
     private async Task Logout()
     {
