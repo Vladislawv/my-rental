@@ -1,5 +1,7 @@
 ﻿@page "/admin"
 
+@attribute [Authorize(Roles = "Admin")]
+
 @inject IJSRuntime Js
 @inject INotificationService NotificationService
 

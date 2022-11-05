@@ -51,7 +51,7 @@
             return;
         }
 
-        var jwt = await GenerateJwtAsync(_user);
+        var jwt = GenerateJwt(_user);
         await LocalStorageService.SetItemAsync("Jwt", jwt);
 
         await AuthStateProvider.GetAuthenticationStateAsync();
@@ -59,7 +59,7 @@
         NavManager.NavigateTo("/user/account", true);
     }
 
-    private async Task<string> GenerateJwtAsync(UserDto user)
+    private string GenerateJwt(UserDto user)
     {
         var claims = new[]
         {
@@ -67,7 +67,7 @@
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
-            new Claim(ClaimTypes.Role, await UserService.GetRoleNameByIdAsync(user.Id))
+            new Claim(ClaimTypes.Role, user.Roles.ElementAt(0).Name)
         };
         
         var token = new JwtSecurityToken(
@@ -81,7 +81,6 @@
                 SecurityAlgorithms.HmacSha256)
             );
 
-        return new JwtSecurityTokenHandler()
-            .WriteToken(token);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

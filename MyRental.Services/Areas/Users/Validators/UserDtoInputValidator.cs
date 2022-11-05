@@ -18,8 +18,5 @@ public class UserDtoInputValidator : AbstractValidator<UserDtoInput>
 
         RuleFor(user => user.Password)
             .UserPassword(userService);
-
-        RuleFor(user => user.Role)
-            .NotEmpty();
     }
 }

@@ -2,7 +2,6 @@
 
 @attribute [Authorize]
 
-@inject AuthenticationStateProvider AuthProvider
 @inject IJSRuntime Js
 @inject NavigationManager NavManager
 @inject IMapper Mapper
@@ -16,7 +15,7 @@
     <br/>
     <br/>
 
-    @if (string.IsNullOrEmpty(_userInput.Role))
+    @if (string.IsNullOrEmpty(_userInput.PhoneNumber))
     {
         <p>
             <em>Loading...</em>
@@ -59,11 +58,6 @@
     {
         var user = await UserService.GetByIdAsync(Id);
         Mapper.Map(user, _userInput);
-
-        var myProvider = (MyAuthenticationStateProvider)AuthProvider;
-        var userSession = myProvider.GetUserSession();
-
-        _userInput.Role = userSession.Role;
     }
 
     private async Task UpdateAsync()

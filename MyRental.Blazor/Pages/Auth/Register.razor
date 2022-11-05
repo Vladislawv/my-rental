@@ -30,15 +30,6 @@
             <InputText class="form-control" id="Password" @bind-Value="_userInput.Password"></InputText>
         </div>
         <div>
-            <label for="Role">Role</label>
-            <InputSelect class="form-select" id="Role" @bind-Value="_userInput.Role">
-                <option value="">Choose your role</option>
-                <option value="Tenant">Tenant</option>
-                <option value="Landlord">Landlord</option>
-                <option value="Realtor">Realtor</option>
-            </InputSelect>
-        </div>
-        <div>
             <label for="Subscribe">Subscribe to Newsletter</label>
             <InputCheckbox class="form-check" id="Subscribe" @bind-Value="_isSubscribed"></InputCheckbox>
         </div>
@@ -66,9 +57,12 @@
             var result = await new UserDtoInputValidator(UserService).ValidateAsync(_userInput);
             if (!result.IsValid)
             {
-                var message = result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage);
+                var message = result.Errors
+                    .Aggregate("", (current, error) => current + error.ErrorMessage);
+                
                 throw new Exception(message);
             }
+            
             await UserService.CreateAsync(_userInput);
             if (_isSubscribed) await NotificationService.SubscribeToNotificationsAsync(_userInput.Email);
         }
