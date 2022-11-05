@@ -61,7 +61,7 @@ public class UserService : IUserService
         var result = await _userManager.CreateAsync(user, userInput.Password);
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
         
-        await _userManager.AddToRoleAsync(user, userInput.Role);
+        await _userManager.AddToRoleAsync(user, "User");
         
         return user.Id;
     }
@@ -82,9 +82,6 @@ public class UserService : IUserService
         await _userManager.RemovePasswordAsync(user);
         await _userManager.AddPasswordAsync(user, userInput.Password);
         
-        await _userManager.RemoveFromRoleAsync(user, user.Roles.ElementAt(0).Name);
-        await _userManager.AddToRoleAsync(user, userInput.Role);
-        
         return user.Id;
     }
 
@@ -96,13 +93,6 @@ public class UserService : IUserService
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
     }
 
-    public async Task<string> GetRoleNameByIdAsync(int id)
-    {
-        var user = await GetEntityByIdAsync(id);
-
-        return user.Roles.ElementAt(0).Name;
-    }
-    
     public async Task<(bool Result, string ErrorMessage)> ValidatePasswordAsync(string password)
     {
         var result = await new PasswordValidator<User>().ValidateAsync(_userManager, null, password);

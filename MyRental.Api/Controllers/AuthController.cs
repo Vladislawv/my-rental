@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
             new Claim(ClaimTypes.Name, loggedInUser.UserName),
             new Claim(ClaimTypes.Email, loggedInUser.Email),
             new Claim(ClaimTypes.MobilePhone, loggedInUser.PhoneNumber),
-            new Claim(ClaimTypes.Role, await _userService.GetRoleNameByIdAsync(loggedInUser.Id))
+            new Claim(ClaimTypes.Role, loggedInUser.Roles.ElementAt(0).Name)
         };
         
         var token = new JwtSecurityToken(

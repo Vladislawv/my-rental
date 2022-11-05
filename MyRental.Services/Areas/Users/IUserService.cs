@@ -10,6 +10,5 @@ public interface IUserService
     public Task<int> CreateAsync(UserDtoInput userInput);
     public Task<int> UpdateByIdAsync(int id, UserDtoInput userInput);
     public Task DeleteByIdAsync(int id);
-    public Task<string> GetRoleNameByIdAsync(int id);
     public Task<(bool Result, string ErrorMessage)> ValidatePasswordAsync(string password);
 }
