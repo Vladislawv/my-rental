@@ -103,7 +103,8 @@ html, body {
     line-height: var(--bs-body-line-height);
     color: var(--bs-body-color);
     text-align: var(--bs-body-text-align);
-    background-color: gray;
+    background-image: url("../images/back.jpg");
+    background-size: 100%, 100%;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -359,7 +360,7 @@ td,
 th {
     width: auto;
     color: white;
-    border-color: black;
+    border-color: white;
     border-style: solid;
     border-width: 0;
 }
@@ -6840,7 +6841,7 @@ header {
 }
 
 .link-info {
-    color: #0936ee !important;
+    color: #09ccee !important;
 }
 .link-info:hover, .link-info:focus {
     color: #1e6fa8 !important;
