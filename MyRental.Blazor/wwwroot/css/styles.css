@@ -104,7 +104,7 @@ html, body {
     color: var(--bs-body-color);
     text-align: var(--bs-body-text-align);
     background-image: url("../images/back.jpg");
-    background-size: 100%, 100%;
+    background-size: auto;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -120,7 +120,7 @@ main{
 }
 
 footer{
-    margin-top: 30px;
+    margin-top: 45px;
     flex: 0 0 auto;
 }
 
@@ -2194,14 +2194,6 @@ progress {
     padding: 0.5rem 1rem;
     font-size: 1.25rem;
     border-radius: 0.5rem;
-}
-
-.hidden{
-    display: none;
-}
-
-.show{
-    display: contents;
 }
 
 .form-control-lg::-webkit-file-upload-button {
@@ -7394,6 +7386,10 @@ header {
     --bs-border-opacity: 1;
 }
 
+.w-16{
+    width: 16% !important;
+}
+
 .w-25 {
     width: 25% !important;
 }
@@ -9610,6 +9606,12 @@ header {
     }
     .order-lg-last {
         order: 6 !important;
+    }
+    .m-d-4{
+        margin-bottom: 4px !important;
+    }
+    .m-l-20{
+        margin-left: 20px !important;
     }
     .m-lg-0 {
         margin: 0 !important;

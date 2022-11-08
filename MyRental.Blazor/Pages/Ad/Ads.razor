@@ -95,7 +95,7 @@
     </table>
 
     <div class="text-center">
-        <button class="btn btn-info"><a href="/"><i class="bi bi-arrow-bar-left"></i></a></button>
+        <a href="/"><button class="btn btn-info"><i class="bi bi-arrow-bar-left"></i></button></a>
         <button class="btn btn-success" @onclick="FindAsync"><i class="bi bi-search"></i></button>
         <button class="btn btn-danger" @onclick="RemoveFilterAsync"><i class="bi bi-trash-fill"></i></button>
     </div>
@@ -134,7 +134,7 @@ else
                 <td>@ad.Area</td>
                 <td>@ad.Title</td>
                 <td>@ad.Price</td>
-                <td><button class="btn btn-info auto-width"><a href="/ads/@ad.Id"><i class="bi bi-three-dots"></i></a></button></td>
+            <td><a href="/ads/@ad.Id"><button class="btn btn-info auto-width"><i class="bi bi-three-dots"></i></button></a></td>
             </tr>
         }
         </tbody>
