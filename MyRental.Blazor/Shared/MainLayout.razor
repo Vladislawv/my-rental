@@ -2,7 +2,6 @@
 
 @inject AuthenticationStateProvider AuthProvider
 @inject IJSRuntime Js
-@inject NavigationManager NavManager
 @inject INotificationService NotificationService
 
 <PageTitle>MyRental.Blazor</PageTitle>
@@ -43,25 +42,20 @@
     </main>
     
     <footer class="text-center">
-        <h2>Subscribe to newsletter
-            <button class="btn btn-info" @onclick="SetFooter"><i class="@GetIconClass()"></i></button>
-        </h2>
-
-        <div class="@GetFooterClass()">
-            <EditForm class="mb-5" Model="_email">
-                <div>
-                    <h4>Write your email here</h4>
-                    <InputText class="form-control" id="Email" @bind-Value="_email"></InputText>
-                    <button class="btn btn-success" @onclick="SubscribeToNotificationsAsync">Subscribe</button>
-                </div>
-            </EditForm>
-        </div>
+        <h3>Subscribe to newsletter</h3>
+        
+        <EditForm class="mb-5" Model="_email">
+            <div>
+                <label for="Email">Write your email here</label>
+                <InputText class="form-control w-16" id="Email" @bind-Value="_email"></InputText>
+                <button class="btn btn-success m-d-4 m-l-20" @onclick="SubscribeToNotificationsAsync">Subscribe</button>
+            </div>
+        </EditForm>
     </footer>
 </div>
 
 @code{
     string _email = "";
-    bool _isFooterShow;
 
     private async Task SubscribeToNotificationsAsync()
     {
@@ -81,12 +75,6 @@
         }
     }
     
-    private void SetFooter() => _isFooterShow = !_isFooterShow;
-    
-    private string GetIconClass() => _isFooterShow ? "bi bi-arrow-up" : "bi bi-arrow-down";
-
-    private string GetFooterClass() => _isFooterShow ? "show" : "hidden";
-    
     private async Task Logout()
     {
         var myProvider = (MyAuthenticationStateProvider)AuthProvider;
@@ -96,6 +84,5 @@
     private async Task HandleExceptionAsync()
     {
         await Js.InvokeVoidAsync("alert", "Sorry, something went wrong.");
-        NavManager.NavigateTo("/", forceLoad: true);
     }
 }

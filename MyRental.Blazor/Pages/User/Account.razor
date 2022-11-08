@@ -20,7 +20,7 @@ else
     <br/>
     <div class="text-start">
         <h2 class="text-start">Here is your personal data:
-            <button class="btn btn-primary auto-width"><a href="/user/edit/@_userId"><i class="bi bi-pencil-square"></i></a></button>
+            <a href="/user/edit/@_userId"><button class="btn btn-primary auto-width"><i class="bi bi-pencil-square"></i></button></a>
         </h2>
         <br/>
 
@@ -38,7 +38,7 @@ else
                 <h2 class="text-start">Your ads</h2>
             </div>
             <div class="col-6 text-end">
-                <button style="width: 40px" class="btn btn-success"><a href="/ads/create/@_userId"><i class="bi bi-plus-circle"></i></a></button>
+                <a href="/ads/create/@_userId"><button style="width: 40px" class="btn btn-success"><i class="bi bi-plus-circle"></i></button></a>
             </div>
         </div>
 
@@ -60,8 +60,8 @@ else
                     <td>@ad.Area</td>
                     <td>@ad.Title</td>
                     <td>@ad.Price</td>
-                    <td><button class="btn btn-info auto-width"><a href="/ads/@ad.Id"><i class="bi bi-three-dots"></i></a></button></td>
-                    <td><button class="btn btn-primary auto-width"><a href="/ads/edit/@_userId/@ad.Id"><i class="bi bi-pencil-square"></i></a></button></td>
+                    <td><a href="/ads/@ad.Id"><button class="btn btn-info auto-width"><i class="bi bi-three-dots"></i></button></a></td>
+                    <td><a href="/ads/edit/@_userId/@ad.Id"><button class="btn btn-primary auto-width"><i class="bi bi-pencil-square"></i></button></a></td>
                     <td><button class="btn btn-danger auto-width" @onclick="() => DeleteAdByIdAsync(ad.Id)"><i class="bi bi-trash-fill"></i></button></td>
                 </tr>
             }
