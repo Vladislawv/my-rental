@@ -104,7 +104,9 @@ html, body {
     color: var(--bs-body-color);
     text-align: var(--bs-body-text-align);
     background-image: url("../images/back.jpg");
-    background-size: auto;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
