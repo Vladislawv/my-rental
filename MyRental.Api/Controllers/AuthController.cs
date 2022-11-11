@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MyRental.Services.Areas.Notifications;
 using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Dto;
 
@@ -21,29 +22,44 @@ public class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly IUserService _userService;
+    private readonly INotificationService _notificationService;
 
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="configuration"></param>
     /// <param name="userService"></param>
-    public AuthController(IConfiguration configuration, IUserService userService)
+    /// <param name="notificationService"></param>
+    public AuthController(IConfiguration configuration, IUserService userService, INotificationService notificationService)
     {
         _configuration = configuration;
         _userService = userService;
-        
+        _notificationService = notificationService;
     }
 
     /// <summary>
     /// Register User
     /// </summary>
+    /// <param name="isSubscribed"></param>
+    /// <param name="userInput"></param>
     /// <returns></returns>
     [HttpPost("register")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> RegisterAsync([FromBody] UserDtoInput userInput)
+    public async Task<IActionResult> RegisterAsync([FromQuery] bool isSubscribed, [FromBody] UserDtoInput userInput)
     {
         await _userService.CreateAsync(userInput);
 
+        if (isSubscribed)
+        {
+            try
+            {
+                await _notificationService.SubscribeToNotificationsAsync(userInput.Email);
+            }
+            catch {}
+        }
+        
+        await _notificationService.NotifyOfRegisterAsync(userInput.Email);
+        
         var login = new LoginDto
         {
             Email = userInput.Email,

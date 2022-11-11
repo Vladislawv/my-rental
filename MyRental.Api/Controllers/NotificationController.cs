@@ -66,6 +66,8 @@ public class NotificationController : ControllerBase
     {
         await _notificationService.SubscribeToNotificationsAsync(email);
 
+        await _notificationService.NotifyOfSubscribeAsync(email);
+
         return Ok();
     }
 
