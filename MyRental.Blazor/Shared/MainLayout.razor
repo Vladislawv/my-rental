@@ -49,6 +49,7 @@
                 <label for="Email">Write your email here</label>
                 <InputText class="form-control w-16" id="Email" @bind-Value="_email"></InputText>
                 <button class="btn btn-success m-d-4 m-l-20" @onclick="SubscribeToNotificationsAsync">Subscribe</button>
+                <button class="btn btn-danger m-d-4 m-l-20" @onclick="UnsubscribeFromNotificationsAsync">Unsubscribe</button>
             </div>
         </EditForm>
     </footer>
@@ -64,14 +65,36 @@
             var result = await new EmailValidator()
                 .ValidateAsync(_email);
             
-            if (!result.IsValid) throw new Exception("Invalid email");
+            if (!result.IsValid) throw new Exception("Invalid email.");
             
             await NotificationService.SubscribeToNotificationsAsync(_email);
+
+            await NotificationService.NotifyOfSubscribeAsync(_email);
+            
             await Js.InvokeVoidAsync("alert", "Successfully!");
         }
-        catch
+        catch (Exception e)
         {
-            await HandleExceptionAsync();
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+    
+    private async Task UnsubscribeFromNotificationsAsync()
+    {
+        try
+        {
+            var result = await new EmailValidator()
+                .ValidateAsync(_email);
+            
+            if (!result.IsValid) throw new Exception("Invalid email");
+            
+            await NotificationService.UnsubscribeFromNotificationsAsync(_email);
+            
+            await Js.InvokeVoidAsync("alert", "Successfully!");
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
         }
     }
     

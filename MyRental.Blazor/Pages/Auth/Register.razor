@@ -54,7 +54,9 @@
     {
         try
         {
-            var result = await new UserDtoInputValidator(UserService).ValidateAsync(_userInput);
+            var result = await new UserDtoInputValidator(UserService)
+                .ValidateAsync(_userInput);
+            
             if (!result.IsValid)
             {
                 var message = result.Errors
@@ -64,7 +66,17 @@
             }
             
             await UserService.CreateAsync(_userInput);
-            if (_isSubscribed) await NotificationService.SubscribeToNotificationsAsync(_userInput.Email);
+
+            if (_isSubscribed)
+            {
+                try
+                {
+                    await NotificationService.SubscribeToNotificationsAsync(_userInput.Email);
+                }
+                catch {}
+            }
+            
+            await NotificationService.NotifyOfRegisterAsync(_userInput.Email);
         }
         catch (Exception e)
         {

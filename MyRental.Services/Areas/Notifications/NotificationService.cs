@@ -10,6 +10,7 @@ namespace MyRental.Services.Areas.Notifications;
 public class NotificationService : INotificationService
 {
     private readonly MyRentalContext _context;
+    private static readonly MailAddress From = new("vladusupov2810@gmail.com", "MyRental");
 
     public NotificationService(MyRentalContext context)
     {
@@ -27,34 +28,52 @@ public class NotificationService : INotificationService
 
     public async Task NotifyAsync(Letter letter)
     {
-        var client = new SmtpClient
-        {
-            Host = "smtp.gmail.com",
-            Port = 587,
-            EnableSsl = true,
-            DeliveryMethod = SmtpDeliveryMethod.Network,
-            UseDefaultCredentials = false,
-            Credentials = new NetworkCredential
-            {
-                UserName = "vladusupov2810@gmail.com",
-                Password = "mcgqcsljtuezklbx"
-            }
-        };
-    
-        var from = new MailAddress("vladusupov2810@gmail.com", "MyRental");
+        var client = GetClient();
         
         var message = new MailMessage
         {
-            From = from,
+            From = From,
             Subject = letter.Title,
             Body = letter.Message
         };
         
         foreach (var email in await GetListAsync())
         {
-            message.To.Add(new MailAddress(email, "to"));
+            message.Bcc.Add(new MailAddress(email));
         }
         
+        await client.SendMailAsync(message);
+    }
+
+    public async Task NotifyOfSubscribeAsync(string email)
+    {
+        var client = GetClient();
+
+        var message = new MailMessage
+        {
+            From = From,
+            Subject = "You successfully subscribed!",
+            Body = "Thank you for subscribe to our newsletter."
+        };
+        
+        message.Bcc.Add(new MailAddress(email));
+
+        await client.SendMailAsync(message);
+    }
+    
+    public async Task NotifyOfRegisterAsync(string email)
+    {
+        var client = GetClient();
+
+        var message = new MailMessage
+        {
+            From = From,
+            Subject = "You successfully Registered!",
+            Body = "Thank you for registration."
+        };
+
+        message.Bcc.Add(new MailAddress(email));
+
         await client.SendMailAsync(message);
     }
 
@@ -62,7 +81,7 @@ public class NotificationService : INotificationService
     {
         var existingMail = await GetMailByEmail(email);
 
-        if (existingMail != null) throw new Exception("This email is already exist.");
+        if (existingMail != null) throw new Exception("This email is already subscribed!");
         
         var inputMail = new Mail { Email = email };
         
@@ -75,7 +94,7 @@ public class NotificationService : INotificationService
     public async Task UnsubscribeFromNotificationsAsync(string email)
     {
         var mail = await GetMailByEmail(email)
-            ?? throw new Exception("Email is not found.");
+            ?? throw new Exception("This email is not subscribing.");
 
         _context.Mailing
             .Remove(mail);
@@ -87,5 +106,22 @@ public class NotificationService : INotificationService
     {
         return await _context.Mailing
             .FirstOrDefaultAsync(mail => mail.Email == email);
+    }
+
+    private SmtpClient GetClient()
+    {
+        return new SmtpClient
+        {
+            Host = "smtp.gmail.com",
+            Port = 587,
+            EnableSsl = true,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            UseDefaultCredentials = false,
+            Credentials = new NetworkCredential
+            {
+                UserName = "vladusupov2810@gmail.com",
+                Password = "mcgqcsljtuezklbx"
+            }
+        };
     }
 }
