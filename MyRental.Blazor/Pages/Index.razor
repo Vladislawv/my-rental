@@ -10,10 +10,10 @@
 </div>
 
 <div class="text-center">
-    <EditForm Model="_filter">
+    <EditForm Model="_advertisementFilter">
         <div>
             <label for="Country">Country</label>
-            <InputSelect class="form-select" id="Country" @bind-Value="_filter.Country" @oninput="InitCitiesByCountry">
+            <InputSelect class="form-select" id="Country" @bind-Value="_advertisementFilter.Country" @oninput="InitCitiesByCountry">
             
                 @if (_countries == null)
                 {
@@ -31,7 +31,7 @@
         </div>
         <div>
             <label for="City">City</label>
-            <InputSelect class="form-select" id="City" @bind-Value="_filter.City" disabled="@_isCityDisabled">
+            <InputSelect class="form-select" id="City" @bind-Value="_advertisementFilter.City" disabled="@_isCityDisabled">
                 @if (_isCityDisabled)
                 {
                     <option value="">Choose country</option>
@@ -61,7 +61,7 @@
     List<string>? _cities;
     bool _isCityDisabled = true;
     
-    readonly FilterDtoInput _filter = new ();
+    readonly AdvertisementFilterDto _advertisementFilter = new ();
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,7 +70,7 @@
 
     private void Find()
     {
-        NavManager.NavigateTo($"/ads?Country={_filter.Country}&City={_filter.City}");
+        NavManager.NavigateTo($"/advertisements?Country={_advertisementFilter.Country}&City={_advertisementFilter.City}");
     }
     
     private async Task InitCountriesAsync()
@@ -81,7 +81,7 @@
 
     private void InitCitiesByCountry(ChangeEventArgs e)
     {
-        _filter.City = "";
+        _advertisementFilter.City = "";
         _isCityDisabled = e.Value.Equals("");
         if (_isCityDisabled) return;
 

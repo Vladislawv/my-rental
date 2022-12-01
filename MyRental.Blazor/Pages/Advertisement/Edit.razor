@@ -1,26 +1,26 @@
-﻿@page "/ads/edit/{UserId:int}/{AdId:int}"
+﻿@page "/advertisements/edit/{UserId:int}/{AdId:int}"
 
 @attribute [Authorize]
 
 @inject IJSRuntime Js
 @inject NavigationManager NavManager
 @inject IMapper Mapper
-@inject IAdService AdService
+@inject IAdvertisementService AdvertisementService
 
 <PageTitle>Edit</PageTitle>
 
 <h1>Edit</h1>
 <br/>
 
-<EditForm Model="_adInput">
+<EditForm Model="_advertisementInput">
     <div class="text-center">
-        @if (_adInput.Medias != null && _adInput.Medias.Any())
+        @if (_advertisementInput.Medias != null && _advertisementInput.Medias.Any())
         {
             <table class="table-hover">
                 <thead class="custom">
                 <tr>
                     <th>
-                        <img src="@_adInput.Medias.ElementAt(_currentMedia).Data" alt="Photo"/>
+                        <img src="@_advertisementInput.Medias.ElementAt(_currentMedia).Data" alt="Photo"/>
                     </th>
                 </tr>
                 </thead>
@@ -49,7 +49,7 @@
                 <th>
                     <div>
                         <label for="Country">Country</label>
-                        <InputSelect class="form-select text-start" id="Country" @bind-Value="_adInput.Country" @oninput="FindCities">
+                        <InputSelect class="form-select text-start" id="Country" @bind-Value="_advertisementInput.Country" @oninput="FindCities">
                             @if (_countries == null)
                             {
                                 <option value="">Loading...</option>
@@ -68,7 +68,7 @@
                 <th>
                     <div>
                         <label for="City">City</label>
-                        <InputSelect class="form-select text-start" id="City" @bind-Value="_adInput.City" disabled="@_isCityDisabled">
+                        <InputSelect class="form-select text-start" id="City" @bind-Value="_advertisementInput.City" disabled="@_isCityDisabled">
                             @if (_cities == null)
                             {
                                 <option value="">Loading...</option>
@@ -94,7 +94,7 @@
                 <th>
                     <div>
                         <label for="Area">Area</label>
-                        <InputText class="form-control" id="Area" @bind-Value="_adInput.Area"></InputText>
+                        <InputText class="form-control" id="Area" @bind-Value="_advertisementInput.Area"></InputText>
                     </div>
                 </th>
             </tr>
@@ -107,19 +107,19 @@
                 <th>
                     <div>
                         <label for="Rooms">Rooms</label>
-                        <InputNumber class="form-control" id="Rooms" @bind-Value="_adInput.Rooms"></InputNumber>
+                        <InputNumber class="form-control" id="Rooms" @bind-Value="_advertisementInput.Rooms"></InputNumber>
                     </div>
                 </th>
                 <th>
                     <div>
                         <label for="Square">Square</label>
-                        <InputNumber class="form-control" id="Square" @bind-Value="_adInput.Square"></InputNumber>
+                        <InputNumber class="form-control" id="Square" @bind-Value="_advertisementInput.Square"></InputNumber>
                     </div>
                 </th>
                 <th>
                     <div>
                         <label for="Price">Price</label>
-                        <InputNumber class="form-control" id="Price" @bind-Value="_adInput.Price"></InputNumber>
+                        <InputNumber class="form-control" id="Price" @bind-Value="_advertisementInput.Price"></InputNumber>
                     </div>
                 </th>
             </tr>
@@ -132,13 +132,13 @@
                 <th>
                     <div>
                         <label for="Title">Title</label>
-                        <InputTextArea class="form-control w-100" id="Title" @bind-Value="_adInput.Title"></InputTextArea>
+                        <InputTextArea class="form-control w-100" id="Title" @bind-Value="_advertisementInput.Title"></InputTextArea>
                     </div>
                 </th>
                 <th>
                     <div>
                         <label for="Description">Description</label>
-                        <InputTextArea class="form-control w-100" id="Description" @bind-Value="_adInput.Description"></InputTextArea>
+                        <InputTextArea class="form-control w-100" id="Description" @bind-Value="_advertisementInput.Description"></InputTextArea>
                     </div>
                 </th>
             </tr>
@@ -160,10 +160,10 @@
     public int UserId { get; set; }
     
     [Parameter]
-    public int AdId { get; set; }
+    public int AdvertisementId { get; set; }
 
-    readonly AdDtoInput _adInput = new();
-    AdDto? _adDto;
+    readonly AdvertisementDtoInput _advertisementInput = new();
+    AdvertisementDto? _adDto;
     List<string>? _countries;
     List<string>? _cities;
     bool _isCityDisabled;
@@ -171,8 +171,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _adDto = await AdService.GetByIdAsync(AdId);
-        Mapper.Map(_adDto, _adInput);
+        _adDto = await AdvertisementService.GetByIdAsync(AdvertisementId);
+        Mapper.Map(_adDto, _advertisementInput);
 
         await FindCountriesAsync();
         InitCities();
@@ -184,16 +184,16 @@
     {
         try
         {
-            _adInput.UserId = UserId;
-            _adInput.CreatedDate = DateTime.Now;
+            _advertisementInput.UserId = UserId;
+            _advertisementInput.CreatedDate = DateTime.Now;
 
-            var result = await new AdDtoInputValidator().ValidateAsync(_adInput);
+            var result = await new AdvertisementDtoInputValidator().ValidateAsync(_advertisementInput);
             if (!result.IsValid)
             {
                 var message = result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage);
                 throw new Exception(message);
             }
-            await AdService.UpdateByIdAsync(AdId, _adInput);
+            await AdvertisementService.UpdateByIdAsync(AdvertisementId, _advertisementInput);
         }
         catch (Exception e)
         {
@@ -216,21 +216,21 @@
 
         var file = new MediaDtoInput
         {
-            AdId = AdId,
+            AdvertisementId = AdvertisementId,
             Data = imageData,
             Name = nameAndExtension[0],
             Extension = nameAndExtension[1]
         };
         
-        _adInput.Medias.Add(file);
+        _advertisementInput.Medias.Add(file);
 
-        _currentMedia = _adInput.Medias.Count - 1;
+        _currentMedia = _advertisementInput.Medias.Count - 1;
     }
 
     void DeleteFile(int id)
     {
-        var file = _adInput.Medias.ElementAt(id);
-        _adInput.Medias.Remove(file);
+        var file = _advertisementInput.Medias.ElementAt(id);
+        _advertisementInput.Medias.Remove(file);
 
         ShowPreviousMedia();
     }
@@ -251,7 +251,7 @@
 
     private void FindCities(ChangeEventArgs e)
     {
-        _adInput.City = "";
+        _advertisementInput.City = "";
         
         _isCityDisabled = e.Value.Equals("");
         if (_isCityDisabled) return;
@@ -264,11 +264,11 @@
     
     private void ShowPreviousMedia()
     {
-        _currentMedia = _currentMedia == 0 ? _adInput.Medias.Count - 1 : _currentMedia -= 1;
+        _currentMedia = _currentMedia == 0 ? _advertisementInput.Medias.Count - 1 : _currentMedia -= 1;
     }
 
     private void ShowNextMedia()
     {
-        _currentMedia = _currentMedia == _adInput.Medias.Count - 1 ? 0 : _currentMedia += 1;
+        _currentMedia = _currentMedia == _advertisementInput.Medias.Count - 1 ? 0 : _currentMedia += 1;
     }
 }

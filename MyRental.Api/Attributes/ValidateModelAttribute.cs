@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
-using MyRental.Services.Areas.Ads.Dto;
-using MyRental.Services.Areas.Ads.Validators;
+using MyRental.Services.Areas.Advertisements.Dto;
+using MyRental.Services.Areas.Advertisements.Validators;
 using MyRental.Services.Areas.Notifications.Validators;
 using MyRental.Services.Areas.Users;
 using MyRental.Services.Areas.Users.Dto;
@@ -43,11 +43,11 @@ public class ValidateModelAttribute : ActionFilterAttribute
 
         if (context.ActionArguments.ContainsKey("adInput"))
         {
-            var adInput = (AdDtoInput)(context
+            var adInput = (AdvertisementDtoInput)(context
                 .ActionArguments["adInput"]
                     ?? throw new Exception("The input is empty!"));
 
-            await new AdDtoInputValidator()
+            await new AdvertisementDtoInputValidator()
                 .ValidateAsync(adInput);
         }
 
