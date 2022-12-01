@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyRental.Services.Areas.Users;
@@ -13,7 +12,7 @@ namespace MyRental.Api.Controllers;
 [ApiController]
 [Route("api/users")]
 [Produces(MediaTypeNames.Application.Json)]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -33,7 +32,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(IList<UserDto>), StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetListAsync()
     {
         var users = await _userService.GetListAsync();
@@ -62,7 +61,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateAsync([FromBody] UserDtoInput userInput)
     {
         var id = await _userService.CreateAsync(userInput);

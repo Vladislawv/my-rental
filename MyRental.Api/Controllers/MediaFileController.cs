@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyRental.Services.Areas.Medias;
@@ -13,7 +12,7 @@ namespace MyRental.Api.Controllers;
 [ApiController]
 [Route("api/media-files")]
 [Produces(MediaTypeNames.Application.Json)]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize]
 public class MediaFileController : ControllerBase
 {
     private readonly IMediaService _mediaService;

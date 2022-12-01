@@ -1,12 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net.Mime;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Net.Mime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using MyRental.Services.Areas.Notifications;
-using MyRental.Services.Areas.Users;
+using MyRental.Services.Areas.Auth;
 using MyRental.Services.Areas.Users.Dto;
 
 namespace MyRental.Api.Controllers;
@@ -20,21 +15,16 @@ namespace MyRental.Api.Controllers;
 [AllowAnonymous]
 public class AuthController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
-    private readonly IUserService _userService;
-    private readonly INotificationService _notificationService;
+    private readonly IAuthService _authService;
+
 
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="configuration"></param>
-    /// <param name="userService"></param>
-    /// <param name="notificationService"></param>
-    public AuthController(IConfiguration configuration, IUserService userService, INotificationService notificationService)
+    /// <param name="authService"></param>
+    public AuthController(IAuthService authService)
     {
-        _configuration = configuration;
-        _userService = userService;
-        _notificationService = notificationService;
+        _authService = authService;
     }
 
     /// <summary>
@@ -47,26 +37,9 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> RegisterAsync([FromQuery] bool isSubscribed, [FromBody] UserDtoInput userInput)
     {
-        await _userService.CreateAsync(userInput);
-
-        if (isSubscribed)
-        {
-            try
-            {
-                await _notificationService.SubscribeToNotificationsAsync(userInput.Email);
-            }
-            catch {}
-        }
+        var token = await _authService.RegisterAsync(isSubscribed, userInput);
         
-        await _notificationService.NotifyOfRegisterAsync(userInput.Email);
-        
-        var login = new LoginDto
-        {
-            Email = userInput.Email,
-            Password = userInput.Password
-        };
-
-        return await LoginAsync(login);
+        return Ok(token);
     }
     
     
@@ -79,31 +52,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginDto login)
     {
-        var loggedInUser = await _userService
-            .GetByLoginAsync(login);
-
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, loggedInUser.Id + ""),
-            new Claim(ClaimTypes.Name, loggedInUser.UserName),
-            new Claim(ClaimTypes.Email, loggedInUser.Email),
-            new Claim(ClaimTypes.MobilePhone, loggedInUser.PhoneNumber),
-            new Claim(ClaimTypes.Role, loggedInUser.Roles.ElementAt(0).Name)
-        };
+        var token = await _authService.LoginAsync(login);
         
-        var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(40),
-            notBefore: DateTime.UtcNow,
-            signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
-                SecurityAlgorithms.HmacSha256)
-        );
-        
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-        
-        return Ok(tokenString);
+        return Ok(token);
     }
 }
