@@ -13,6 +13,7 @@ using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
 using MyRental.Services.Areas.Advertisements;
+using MyRental.Services.Areas.Auth;
 using MyRental.Services.Areas.Medias;
 using MyRental.Services.Areas.Notifications;
 using MyRental.Services.Areas.Users;
@@ -99,6 +100,8 @@ builder.Services.AddTransient<IAdvertisementService, AdvertisementService>();
 builder.Services.AddTransient<IMediaService, MediaService>();
 
 builder.Services.AddTransient<INotificationService, NotificationService>();
+
+builder.Services.AddTransient<IAuthService, AuthService>();
 
 var app = builder.Build();
 

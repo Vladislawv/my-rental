@@ -16,8 +16,7 @@ namespace MyRental.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-
-
+    
     /// <summary>
     /// Constructor
     /// </summary>
@@ -37,9 +36,9 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> RegisterAsync([FromQuery] bool isSubscribed, [FromBody] UserDtoInput userInput)
     {
-        var token = await _authService.RegisterAsync(isSubscribed, userInput);
+        await _authService.RegisterAsync(isSubscribed, userInput);
         
-        return Ok(token);
+        return Ok();
     }
     
     
