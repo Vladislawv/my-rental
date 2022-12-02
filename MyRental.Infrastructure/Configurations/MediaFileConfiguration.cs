@@ -8,8 +8,8 @@ public class MediaFileConfiguration : IEntityTypeConfiguration<MediaFile>
 {
     public void Configure(EntityTypeBuilder<MediaFile> builder)
     {
-        builder.HasOne(file => file.Ad)
+        builder.HasOne(file => file.Advertisement)
             .WithMany(ad => ad.Medias)
-            .HasForeignKey(file => file.AdId);
+            .HasForeignKey(file => file.AdvertisementId);
     }
 }

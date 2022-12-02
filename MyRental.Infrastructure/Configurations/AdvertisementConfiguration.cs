@@ -4,12 +4,12 @@ using MyRental.Infrastructure.Entities;
 
 namespace MyRental.Infrastructure.Configurations;
 
-public class AdConfiguration : IEntityTypeConfiguration<Advertisement>
+public class AdvertisementConfiguration : IEntityTypeConfiguration<Advertisement>
 {
     public void Configure(EntityTypeBuilder<Advertisement> builder)
     {
         builder.HasOne(ad => ad.User)
-            .WithMany(user => user.Ads)
+            .WithMany(user => user.Advertisements)
             .HasForeignKey(ad => ad.UserId);
     }
 }

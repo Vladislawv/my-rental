@@ -12,8 +12,7 @@ using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Infrastructure.Seeders;
 using MyRental.Services;
-using MyRental.Services.Areas.Ads;
-using MyRental.Services.Areas.Auth;
+using MyRental.Services.Areas.Advertisements;
 using MyRental.Services.Areas.Medias;
 using MyRental.Services.Areas.Notifications;
 using MyRental.Services.Areas.Users;
@@ -48,7 +47,7 @@ builder.Services.AddSwaggerGen(options =>
 
     var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
-
+    
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Scheme = "Bearer",
@@ -69,44 +68,37 @@ builder.Services.AddSwaggerGen(options =>
                     Type = ReferenceType.SecurityScheme
                 }
             },
-            new List<string>()
+            new List<string>() 
         }
     });
 });
 
-builder.Services.AddAuthentication(x =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
     {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateActor = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
+        ValidateActor = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        
+    };
+});
 builder.Services.AddAuthorization();
 
 builder.Services.AddTransient<ISeeder<Role>, RolesSeeder>();
 
 builder.Services.AddTransient<IUserService, UserService>();
 
-builder.Services.AddTransient<IAdService, AdService>();
+builder.Services.AddTransient<IAdvertisementService, AdvertisementService>();
 
 builder.Services.AddTransient<IMediaService, MediaService>();
 
 builder.Services.AddTransient<INotificationService, NotificationService>();
-
-builder.Services.AddTransient<IAuthService, AuthService>();
 
 var app = builder.Build();
 

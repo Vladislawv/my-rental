@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using MyRental.Services.Areas.Ads.Dto;
+using MyRental.Services.Areas.Advertisements.Dto;
 
-namespace MyRental.Services.Areas.Ads.Validators;
+namespace MyRental.Services.Areas.Advertisements.Validators;
 
-public class AdDtoInputValidator : AbstractValidator<AdDtoInput>
+public class AdvertisementDtoInputValidator : AbstractValidator<AdvertisementDtoInput>
 {
-    public AdDtoInputValidator()
+    public AdvertisementDtoInputValidator()
     {
         RuleFor(ad => ad.UserId).NotEmpty();
         
