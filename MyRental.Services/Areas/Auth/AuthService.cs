@@ -22,21 +22,13 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
 
-    public async Task<string> RegisterAsync(bool isSubscribed, UserDtoInput userInput)
+    public async Task RegisterAsync(bool isSubscribed, UserDtoInput userInput)
     {
         await _userService.CreateAsync(userInput);
 
         if (isSubscribed) await _notificationService.SubscribeToNotificationsAsync(userInput.Email);
         
         await _notificationService.NotifyOfRegisterAsync(userInput.Email);
-        
-        var login = new LoginDto
-        {
-            Email = userInput.Email,
-            Password = userInput.Password
-        };
-
-        return await LoginAsync(login);
     }
 
     public async Task<string> LoginAsync(LoginDto login)

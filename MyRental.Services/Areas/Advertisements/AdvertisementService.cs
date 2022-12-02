@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Advertisements.Dto;
-using MyRental.Services.Areas.Users;
 
 namespace MyRental.Services.Areas.Advertisements;
 
@@ -13,7 +12,7 @@ public class AdvertisementService : IAdvertisementService
     private readonly MyRentalContext _context;
     private readonly IMapper _mapper;
 
-    public AdvertisementService(MyRentalContext context, IMapper mapper, IUserService userService)
+    public AdvertisementService(MyRentalContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;

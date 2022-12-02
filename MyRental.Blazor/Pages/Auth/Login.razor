@@ -1,10 +1,8 @@
 ﻿@page "/auth/login"
 
-@inject IConfiguration Configuration
 @inject ILocalStorageService LocalStorageService
 @inject AuthenticationStateProvider AuthStateProvider
-@inject IUserService UserService
-@inject IJSRuntime Js
+@inject IAuthService AuthService
 @inject NavigationManager NavManager
 
 <PageTitle>Login</PageTitle>
@@ -37,50 +35,15 @@
 @code
 {
     readonly LoginDto _login = new();
-    UserDto? _user;
 
     private async void LoginAsync()
     {
-        try
-        {
-            _user = await UserService.GetByLoginAsync(_login);
-        }
-        catch (Exception e)
-        {
-            await Js.InvokeVoidAsync("alert", e.Message);
-            return;
-        }
-
-        var jwt = GenerateJwt(_user);
+        var jwt = await AuthService.LoginAsync(_login);
+        
         await LocalStorageService.SetItemAsync("Jwt", jwt);
-
+        
         await AuthStateProvider.GetAuthenticationStateAsync();
         
         NavManager.NavigateTo("/user/account", true);
-    }
-
-    private string GenerateJwt(UserDto user)
-    {
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id + ""),
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.MobilePhone, user.PhoneNumber),
-            new Claim(ClaimTypes.Role, user.Roles.ElementAt(0).Name)
-        };
-        
-        var token = new JwtSecurityToken(
-            issuer: Configuration["Jwt:Issuer"],
-            audience: Configuration["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(40),
-            notBefore: DateTime.UtcNow,
-            signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
-                SecurityAlgorithms.HmacSha256)
-            );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
