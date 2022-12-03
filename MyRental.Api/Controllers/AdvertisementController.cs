@@ -30,7 +30,7 @@ public class AdvertisementController : ControllerBase
     /// Get List of Advertisements
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
+    [HttpGet("list")]
     [ProducesResponseType(typeof(IList<AdvertisementDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetListAsync([FromQuery] AdvertisementFilterDto advertisementFilter)
     {
