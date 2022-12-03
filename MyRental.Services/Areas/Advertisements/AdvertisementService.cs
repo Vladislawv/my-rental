@@ -49,6 +49,11 @@ public class AdvertisementService : IAdvertisementService
         
         var ad = _mapper.Map<Advertisement>(advertisementInput);
 
+        for (var i = 0; i < advertisementInput.Medias.Count; i++)
+        {
+            ad.Medias.ElementAt(i).Length = advertisementInput.Medias.ElementAt(i).Data.Length;
+        }
+        
         await _context.Advertisements.AddAsync(ad);
         await _context.SaveChangesAsync();
 
@@ -63,6 +68,11 @@ public class AdvertisementService : IAdvertisementService
 
         _mapper.Map(advertisementInput, ad);
 
+        for (var i = 0; i < advertisementInput.Medias.Count; i++)
+        {
+            ad.Medias.ElementAt(i).Length = advertisementInput.Medias.ElementAt(i).Data.Length;
+        }
+        
         _context.Advertisements.Update(ad);
         await _context.SaveChangesAsync();
 
