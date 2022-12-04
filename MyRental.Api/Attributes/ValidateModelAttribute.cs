@@ -1,10 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
-using MyRental.Services.Areas.Ads.Dto;
-using MyRental.Services.Areas.Ads.Validators;
-using MyRental.Services.Areas.Notifications.Validators;
-using MyRental.Services.Areas.Users;
-using MyRental.Services.Areas.Users.Dto;
-using MyRental.Services.Areas.Users.Validators;
 
 namespace MyRental.Api.Attributes;
 
@@ -13,54 +7,21 @@ namespace MyRental.Api.Attributes;
 /// </summary>
 public class ValidateModelAttribute : ActionFilterAttribute
 {
-    private readonly IUserService _userService;
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="userService"></param>
-    public ValidateModelAttribute(IUserService userService)
-    {
-        _userService = userService;
-    }
-
     /// <summary>
     /// Validate userInput model
     /// </summary>
     /// <param name="context"></param>
-    /// <param name="next"></param>
     /// <returns></returns>
-    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
-        if (context.ActionArguments.ContainsKey("userInput")) {
-            var userInput = (UserDtoInput)(context
-                .ActionArguments["userInput"] 
-                    ?? throw new Exception("The input is empty!"));
-
-            await new UserDtoInputValidator(_userService)
-                .ValidateAsync(userInput);
-        }
-
-        if (context.ActionArguments.ContainsKey("adInput"))
+        if (!context.ModelState.IsValid)
         {
-            var adInput = (AdDtoInput)(context
-                .ActionArguments["adInput"]
-                    ?? throw new Exception("The input is empty!"));
-
-            await new AdDtoInputValidator()
-                .ValidateAsync(adInput);
+            var validationExceptions = context.ModelState
+                .Select(m =>
+                    new Exception(string.Join(Environment.NewLine, m.Value!.Errors.Select(e => e.ErrorMessage))))
+                .Where(x => !string.IsNullOrWhiteSpace(x.Message));
+            
+            throw new AggregateException(validationExceptions);
         }
-
-        if (context.ActionArguments.ContainsKey("email"))
-        {
-            var email = (string)(context
-                .ActionArguments["email"]
-                    ?? throw new Exception("The input is empty!"));
-
-            await new EmailValidator()
-                .ValidateAsync(email);
-        }
-
-        await next.Invoke();
     }
 }
