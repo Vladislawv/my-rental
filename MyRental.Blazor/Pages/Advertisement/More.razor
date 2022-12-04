@@ -4,7 +4,7 @@
 
 <PageTitle>More</PageTitle>
 
-@if (_ad == null)
+@if (_advertisement == null)
 {
     <p>
         <em>Loading...</em>
@@ -12,13 +12,13 @@
 }
 else
 {
-    @if (_ad.Medias.Any())
+    @if (_advertisement.Medias.Any())
     {
         <table class="table-hover">
             <thead class="custom">
             <tr>
                 <th>
-                    <img src="@_ad.Medias.ElementAt(_currentMedia).Data" alt="Photo"/>
+                    <img src="@_advertisement.Medias.ElementAt(_currentMedia).Data" alt="Photo"/>
                 </th>
             </tr>
             </thead>
@@ -52,15 +52,15 @@ else
         </thead>
         <tbody>
         <tr>
-            <td>@_ad.Country</td>
-            <td>@_ad.City</td>
-            <td>@_ad.Area</td>
-            <td>@_ad.Title</td>
-            <td>@_ad.Rooms</td>
-            <td>@_ad.Square</td>
-            <td>@_ad.Price</td>
-            <td>@_ad.Description</td>
-            <td>@_ad.CreatedDate.ToShortDateString()</td>
+            <td>@_advertisement.Country</td>
+            <td>@_advertisement.City</td>
+            <td>@_advertisement.Area</td>
+            <td>@_advertisement.Title</td>
+            <td>@_advertisement.Rooms</td>
+            <td>@_advertisement.Square</td>
+            <td>@_advertisement.Price</td>
+            <td>@_advertisement.Description</td>
+            <td>@_advertisement.CreatedDate.ToShortDateString()</td>
         </tr>
         </tbody>
     </table>
@@ -76,21 +76,21 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    AdvertisementDto? _ad;
+    AdvertisementDto? _advertisement;
     int _currentMedia;
     
     protected override async Task OnInitializedAsync()
     {
-        _ad = await AdvertisementService.GetByIdAsync(Id);
+        _advertisement = await AdvertisementService.GetByIdAsync(Id);
     }
 
     private void ShowPreviousMedia()
     {
-        _currentMedia = _currentMedia == 0 ? _ad.Medias.Count - 1 : _currentMedia -= 1;
+        _currentMedia = _currentMedia == 0 ? _advertisement.Medias.Count - 1 : _currentMedia -= 1;
     }
 
     private void ShowNextMedia()
     {
-        _currentMedia = _currentMedia == _ad.Medias.Count - 1 ? 0 : _currentMedia += 1;
+        _currentMedia = _currentMedia == _advertisement.Medias.Count - 1 ? 0 : _currentMedia += 1;
     }
 }

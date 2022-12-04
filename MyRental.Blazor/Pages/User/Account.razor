@@ -54,7 +54,7 @@ else
             </tr>
             </thead>
             <tbody>
-            @foreach (var ad in _ads)
+            @foreach (var ad in _advertisements)
             {
                 <tr>
                     <td>@ad.Area</td>
@@ -62,7 +62,7 @@ else
                     <td>@ad.Price</td>
                     <td><a href="/advertisements/@ad.Id"><button class="btn btn-info auto-width"><i class="bi bi-three-dots"></i></button></a></td>
                     <td><a href="/advertisements/edit/@_userId/@ad.Id"><button class="btn btn-primary auto-width"><i class="bi bi-pencil-square"></i></button></a></td>
-                    <td><button class="btn btn-danger auto-width" @onclick="() => DeleteAdByIdAsync(ad.Id)"><i class="bi bi-trash-fill"></i></button></td>
+                    <td><button class="btn btn-danger auto-width" @onclick="() => DeleteAdvertisementByIdAsync(ad.Id)"><i class="bi bi-trash-fill"></i></button></td>
                 </tr>
             }
             </tbody>
@@ -74,7 +74,7 @@ else
 {
     int _userId;
     UserDto? _user;
-    IList<AdvertisementDto>? _ads;
+    IList<AdvertisementDto>? _advertisements;
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,10 +92,10 @@ else
             await myProvider.LogoutAsync();
         }
         
-        _ads = await AdvertisementService.GetListAsync(new AdvertisementFilterDto{UserId = _userId});
+        _advertisements = await AdvertisementService.GetListAsync(new AdvertisementFilterDto{UserId = _userId});
     }
 
-    private async Task DeleteAdByIdAsync(int id)
+    private async Task DeleteAdvertisementByIdAsync(int id)
     {
         try
         {

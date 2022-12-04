@@ -34,9 +34,9 @@ public class AdvertisementController : ControllerBase
     [ProducesResponseType(typeof(IList<AdvertisementDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetListAsync([FromQuery] AdvertisementFilterDto advertisementFilter)
     {
-        var ads = await _advertisementService.GetListAsync(advertisementFilter);
+        var advertisements = await _advertisementService.GetListAsync(advertisementFilter);
 
-        return Ok(ads);
+        return Ok(advertisements);
     }
 
     /// <summary>
@@ -63,10 +63,10 @@ public class AdvertisementController : ControllerBase
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateAsync([FromBody] AdvertisementDtoInput advertisementInput)
     {
-        var adId = await _advertisementService.CreateAsync(advertisementInput);
-        var ad = await _advertisementService.GetByIdAsync(adId);
+        var advertisementId = await _advertisementService.CreateAsync(advertisementInput);
+        var advertisement = await _advertisementService.GetByIdAsync(advertisementId);
 
-        return Ok(ad);
+        return Ok(advertisement);
     }
 
     /// <summary>
@@ -78,12 +78,13 @@ public class AdvertisementController : ControllerBase
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(AdvertisementDto), StatusCodes.Status200OK)]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<IActionResult> UpdateByIdAsync([FromRoute] int id, [FromBody] AdvertisementDtoInput advertisementInput)
+    public async Task<IActionResult> UpdateByIdAsync([FromRoute] int id, 
+        [FromBody] AdvertisementDtoInput advertisementInput)
     {
-        var adId = await _advertisementService.UpdateByIdAsync(id, advertisementInput);
-        var ad = await _advertisementService.GetByIdAsync(adId);
+        var advertisementId = await _advertisementService.UpdateByIdAsync(id, advertisementInput);
+        var advertisement = await _advertisementService.GetByIdAsync(advertisementId);
 
-        return Ok(ad);
+        return Ok(advertisement);
     }
 
     /// <summary>
