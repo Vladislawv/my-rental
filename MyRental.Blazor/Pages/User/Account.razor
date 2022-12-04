@@ -85,9 +85,9 @@ else
         {
             _user = await UserService.GetByIdAsync(_userId);
         }
-        catch
+        catch (Exception e)
         {
-            await Js.InvokeVoidAsync("alert", "User not found");
+            await Js.InvokeVoidAsync("alert", e.Message);
 
             await myProvider.LogoutAsync();
         }
@@ -104,7 +104,6 @@ else
         catch (Exception e)
         {
             await Js.InvokeVoidAsync("alert", e.Message);
-            return;
         }
         
         await OnInitializedAsync();
