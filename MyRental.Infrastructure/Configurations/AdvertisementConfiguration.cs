@@ -8,8 +8,8 @@ public class AdvertisementConfiguration : IEntityTypeConfiguration<Advertisement
 {
     public void Configure(EntityTypeBuilder<Advertisement> builder)
     {
-        builder.HasOne(ad => ad.User)
+        builder.HasOne(advertisement => advertisement.User)
             .WithMany(user => user.Advertisements)
-            .HasForeignKey(ad => ad.UserId);
+            .HasForeignKey(advertisement => advertisement.UserId);
     }
 }

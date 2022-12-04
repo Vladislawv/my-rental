@@ -9,7 +9,7 @@ public class MediaFileConfiguration : IEntityTypeConfiguration<MediaFile>
     public void Configure(EntityTypeBuilder<MediaFile> builder)
     {
         builder.HasOne(file => file.Advertisement)
-            .WithMany(ad => ad.Medias)
+            .WithMany(advertisement => advertisement.Medias)
             .HasForeignKey(file => file.AdvertisementId);
     }
 }
