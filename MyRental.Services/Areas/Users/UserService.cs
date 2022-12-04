@@ -68,7 +68,10 @@ public class UserService : IUserService
     
     public async Task<int> UpdateByIdAsync(int id, UserDtoInput userInput)
     {
-        var user = await GetEntityByIdAsync(id);
+        var user = await _userManager.Users
+            .Include(user => user.Advertisements)
+            .FirstOrDefaultAsync(user => user.Id == id)
+                ?? throw new Exception($"User with Id:{id} is not found.");
 
         if (user.Email != userInput.Email) await CheckIfEmailIsFreeAsync(userInput.Email);
 
@@ -87,7 +90,9 @@ public class UserService : IUserService
 
     public async Task DeleteByIdAsync(int id)
     {
-        var user = await GetEntityByIdAsync(id);
+        var user = await _userManager.Users
+            .FirstOrDefaultAsync(user => user.Id == id)
+                ?? throw new Exception($"User with Id:{id} is not found.");
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
@@ -113,12 +118,5 @@ public class UserService : IUserService
             .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
 
         if (userWithSamePhoneNumber != null) throw new Exception("This Phone number is already taken.");
-    }
-
-    private async Task<User> GetEntityByIdAsync(int id)
-    {
-        return await _userManager.Users
-            .FirstOrDefaultAsync(user => user.Id == id)
-                ?? throw new Exception($"User with Id:{id} is not found.");
     }
 }

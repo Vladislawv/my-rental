@@ -62,28 +62,33 @@ public class AdvertisementService : IAdvertisementService
 
     public async Task<int> UpdateByIdAsync(int id, AdvertisementDtoInput advertisementInput)
     {
-        var ad = await GetEntityByIdAsync(id);
+        var advertisement = await _context.Advertisements
+            .Include(ad => ad.Medias)
+            .FirstOrDefaultAsync(ad => ad.Id == id)
+                ?? throw new Exception($"Ad with Id:{id} is not found.");
 
-        if (ad.Title != advertisementInput.Title) await CheckIfTitleIsFreeAsync(advertisementInput.Title);
+        if (advertisement.Title != advertisementInput.Title) await CheckIfTitleIsFreeAsync(advertisementInput.Title);
 
-        _mapper.Map(advertisementInput, ad);
+        _mapper.Map(advertisementInput, advertisement);
 
         for (var i = 0; i < advertisementInput.Medias.Count; i++)
         {
-            ad.Medias.ElementAt(i).Length = advertisementInput.Medias.ElementAt(i).Data.Length;
+            advertisement.Medias.ElementAt(i).Length = advertisementInput.Medias.ElementAt(i).Data.Length;
         }
         
-        _context.Advertisements.Update(ad);
+        _context.Advertisements.Update(advertisement);
         await _context.SaveChangesAsync();
 
-        return ad.Id;
+        return advertisement.Id;
     }
 
     public async Task DeleteByIdAsync(int id)
     {
-        var ad = await GetEntityByIdAsync(id);
+        var advertisement = await _context.Advertisements
+            .FirstOrDefaultAsync(ad => ad.Id == id)
+                ?? throw new Exception($"Ad with Id:{id} is not found.");
 
-        _context.Remove(ad);
+        _context.Remove(advertisement);
         await _context.SaveChangesAsync();
     }
 
@@ -93,12 +98,5 @@ public class AdvertisementService : IAdvertisementService
             .FirstOrDefaultAsync(ad => ad.Title == title);
 
         if (adWithSameTitle != null) throw new Exception("Ad with this title is already exists.");
-    }
-
-    private async Task<Advertisement> GetEntityByIdAsync(int id)
-    {
-        return await _context.Advertisements
-            .FirstOrDefaultAsync(ad => ad.Id == id)
-                ?? throw new Exception($"Ad with Id:{id} is not found.");
     }
 }
