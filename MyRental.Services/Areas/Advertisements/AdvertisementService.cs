@@ -24,13 +24,17 @@ public class AdvertisementService : IAdvertisementService
             .ProjectTo<AdvertisementDto>(_mapper.ConfigurationProvider);
 
         if (advertisementFilter.UserId.HasValue) query = query.Where(ad => ad.UserId == advertisementFilter.UserId);
-        if (!string.IsNullOrEmpty(advertisementFilter.Country)) query = query.Where(ad => ad.Country == advertisementFilter.Country);
-        if (!string.IsNullOrEmpty(advertisementFilter.City)) query = query.Where(ad => ad.City == advertisementFilter.City);
-        if (!string.IsNullOrEmpty(advertisementFilter.Area)) query = query.Where(ad => ad.Area == advertisementFilter.Area);
+        if (!string.IsNullOrEmpty(advertisementFilter.Country))
+            query = query.Where(ad => ad.Country == advertisementFilter.Country);
+        if (!string.IsNullOrEmpty(advertisementFilter.City))
+            query = query.Where(ad => ad.City == advertisementFilter.City);
+        if (!string.IsNullOrEmpty(advertisementFilter.Area))
+            query = query.Where(ad => ad.Area == advertisementFilter.Area);
         if (advertisementFilter.Rooms.HasValue) query = query.Where(ad => ad.Rooms == advertisementFilter.Rooms);
         if (advertisementFilter.Square.HasValue) query = query.Where(ad => ad.Square > advertisementFilter.Square);
         if (advertisementFilter.Price.HasValue) query = query.Where(ad => ad.Price < advertisementFilter.Price);
-        if (advertisementFilter.CreatedDate.HasValue) query = query.Where(ad => ad.CreatedDate > advertisementFilter.CreatedDate);
+        if (advertisementFilter.CreatedDate.HasValue)
+            query = query.Where(ad => ad.CreatedDate > advertisementFilter.CreatedDate);
 
         return await query.ToListAsync();
     }
@@ -45,50 +49,53 @@ public class AdvertisementService : IAdvertisementService
 
     public async Task<int> CreateAsync(AdvertisementDtoInput advertisementInput)
     {
-        await CheckIfTitleIsFreeAsync(advertisementInput.Title);
+        if (await _context.Advertisements.AnyAsync(ad => ad.Title == advertisementInput.Title)) 
+            throw new Exception("Ad with this title is already exists.");
         
-        var ad = _mapper.Map<Advertisement>(advertisementInput);
+        var advertisement = _mapper.Map<Advertisement>(advertisementInput);
 
-        await _context.Advertisements.AddAsync(ad);
+        for (var i = 0; i < advertisementInput.Medias.Count; i++)
+        {
+            advertisement.Medias.ElementAt(i).Length = advertisementInput.Medias.ElementAt(i).Data.Length;
+        }
+        
+        await _context.Advertisements.AddAsync(advertisement);
         await _context.SaveChangesAsync();
 
-        return ad.Id;
+        return advertisement.Id;
     }
 
     public async Task<int> UpdateByIdAsync(int id, AdvertisementDtoInput advertisementInput)
     {
-        var ad = await GetEntityByIdAsync(id);
+        var advertisement = await _context.Advertisements
+            .Include(ad => ad.Medias)
+            .FirstOrDefaultAsync(ad => ad.Id == id)
+                ?? throw new Exception($"Ad with Id:{id} is not found.");
 
-        if (ad.Title != advertisementInput.Title) await CheckIfTitleIsFreeAsync(advertisementInput.Title);
+        if (advertisement.Title != advertisementInput.Title &&
+            await _context.Advertisements.AnyAsync(ad => ad.Title == advertisementInput.Title))
+            throw new Exception("Ad with this title is already exists.");
 
-        _mapper.Map(advertisementInput, ad);
+        _mapper.Map(advertisementInput, advertisement);
 
-        _context.Advertisements.Update(ad);
+        for (var i = 0; i < advertisementInput.Medias.Count; i++)
+        {
+            advertisement.Medias.ElementAt(i).Length = advertisementInput.Medias.ElementAt(i).Data.Length;
+        }
+        
+        _context.Advertisements.Update(advertisement);
         await _context.SaveChangesAsync();
 
-        return ad.Id;
+        return advertisement.Id;
     }
 
     public async Task DeleteByIdAsync(int id)
     {
-        var ad = await GetEntityByIdAsync(id);
-
-        _context.Remove(ad);
-        await _context.SaveChangesAsync();
-    }
-
-    private async Task CheckIfTitleIsFreeAsync(string title)
-    {
-        var adWithSameTitle = await _context.Advertisements
-            .FirstOrDefaultAsync(ad => ad.Title == title);
-
-        if (adWithSameTitle != null) throw new Exception("Ad with this title is already exists.");
-    }
-
-    private async Task<Advertisement> GetEntityByIdAsync(int id)
-    {
-        return await _context.Advertisements
+        var advertisement = await _context.Advertisements
             .FirstOrDefaultAsync(ad => ad.Id == id)
                 ?? throw new Exception($"Ad with Id:{id} is not found.");
+
+        _context.Remove(advertisement);
+        await _context.SaveChangesAsync();
     }
 }

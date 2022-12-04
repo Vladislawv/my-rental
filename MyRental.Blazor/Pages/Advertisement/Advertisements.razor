@@ -103,7 +103,7 @@
     <br/>
 </EditForm>
 
-@if (_ads == null)
+@if (_advertisements == null)
 {
     <p>
         <em>Loading...</em>
@@ -122,7 +122,7 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var ad in _ads)
+        @foreach (var ad in _advertisements)
         {
             <tr>
                 <td class="p-0">
@@ -151,7 +151,7 @@ else
     [SupplyParameterFromQuery(Name = "City")]
     public string? City { get; set; }
     
-    IList<AdvertisementDto>? _ads;
+    IList<AdvertisementDto>? _advertisements;
     List<string>? _countries;
     bool _isCityDisabled;
     List<string>? _cities;
@@ -162,7 +162,7 @@ else
         _advertisementFilter.Country = Country;
         _advertisementFilter.City = City;
         
-        _ads = await AdvertisementService.GetListAsync(_advertisementFilter);
+        _advertisements = await AdvertisementService.GetListAsync(_advertisementFilter);
 
         _isCityDisabled = string.IsNullOrEmpty(Country);
         
@@ -172,7 +172,7 @@ else
 
     private async Task FindAsync()
     {
-        _ads = await AdvertisementService.GetListAsync(_advertisementFilter);
+        _advertisements = await AdvertisementService.GetListAsync(_advertisementFilter);
     }
     
     private async Task RemoveFilterAsync()
@@ -180,7 +180,7 @@ else
         _advertisementFilter = new AdvertisementFilterDto();
         _isCityDisabled = true;
         
-        _ads = await AdvertisementService.GetListAsync(_advertisementFilter);
+        _advertisements = await AdvertisementService.GetListAsync(_advertisementFilter);
     }
     
     void InitCities()
