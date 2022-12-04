@@ -1,9 +1,8 @@
 ﻿@page "/auth/register"
 
-@inject IJSRuntime Js
 @inject NavigationManager NavigationManager
 @inject IUserService UserService
-@inject INotificationService NotificationService
+@inject IAuthService AuthService
 
 <PageTitle>Register</PageTitle>
 
@@ -11,7 +10,7 @@
     <h1>Sign Up</h1>
     <h4>It takes a minute</h4>
     <br/>
-    
+
     <EditForm Model="_userInput">
         <div>
             <label for="UserName">Name</label>
@@ -36,12 +35,18 @@
     </EditForm>
     <br/>
     <br/>
-    
-    <a href="/"><button class="btn btn-info auto-width"><i class="bi bi-arrow-bar-left"></i></button></a>
-    <button class="btn btn-success auto-width" @onclick="SignUpAsync"><i class="bi bi-check-square"></i></button>
+
+    <a href="/">
+        <button class="btn btn-info auto-width">
+            <i class="bi bi-arrow-bar-left"></i>
+        </button>
+    </a>
+    <button class="btn btn-success auto-width" @onclick="RegisterAsync">
+        <i class="bi bi-check-square"></i>
+    </button>
     <br/>
     <br/>
-    
+
     <p>Already have an account? <a class="link-info" href="/auth/login">Login here</a></p>
 </div>
 
@@ -49,40 +54,21 @@
 {
     readonly UserDtoInput _userInput = new();
     bool _isSubscribed;
-    
-    private async void SignUpAsync()
-    {
-        try
-        {
-            var result = await new UserDtoInputValidator(UserService)
-                .ValidateAsync(_userInput);
-            
-            if (!result.IsValid)
-            {
-                var message = result.Errors
-                    .Aggregate("", (current, error) => current + error.ErrorMessage);
-                
-                throw new Exception(message);
-            }
-            
-            await UserService.CreateAsync(_userInput);
 
-            if (_isSubscribed)
-            {
-                try
-                {
-                    await NotificationService.SubscribeToNotificationsAsync(_userInput.Email);
-                }
-                catch {}
-            }
-            
-            await NotificationService.NotifyOfRegisterAsync(_userInput.Email);
-        }
-        catch (Exception e)
+    private async void RegisterAsync()
+    {
+        var validationResult = await new UserDtoInputValidator(UserService)
+            .ValidateAsync(_userInput);
+
+        if (!validationResult.IsValid)
         {
-            await Js.InvokeVoidAsync("alert", e.Message);
-            return;
+            var message = validationResult.Errors
+                .Aggregate("", (current, error) => current + error.ErrorMessage);
+
+            throw new Exception(message);
         }
+
+        await AuthService.RegisterAsync(_isSubscribed, _userInput);
         
         NavigationManager.NavigateTo("/auth/login");
     }

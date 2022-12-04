@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyRental.Infrastructure;
 
@@ -11,9 +12,10 @@ using MyRental.Infrastructure;
 namespace MyRental.Infrastructure.Migrations
 {
     [DbContext(typeof(MyRentalContext))]
-    partial class MyRentalContextModelSnapshot : ModelSnapshot
+    [Migration("20221201100344_Renamed_Ad_To_Advertisement")]
+    partial class Renamed_Ad_To_Advertisement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

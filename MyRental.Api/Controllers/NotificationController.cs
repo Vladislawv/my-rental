@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyRental.Services.Areas.Notifications;
@@ -32,7 +31,7 @@ public class NotificationController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(IList<string>), StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetListAsync()
     {
         var list = await _notificationService.GetListAsync();
@@ -47,7 +46,7 @@ public class NotificationController : ControllerBase
     /// <returns></returns>
     [HttpPost("send")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> NotifyAsync([FromBody] Letter letter)
     {
         await _notificationService.NotifyAsync(letter);

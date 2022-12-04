@@ -1,21 +1,21 @@
-﻿@page "/ads"
+﻿@page "/advertisements"
 
-@inject IAdService AdService
+@inject IAdvertisementService AdvertisementService
 
-<PageTitle>Ads</PageTitle>
+<PageTitle>Advertisements</PageTitle>
 
 <h2>Here you can found ads by more filters</h2>
 <br/>
 
 
-<EditForm Model="_filter">
+<EditForm Model="_advertisementFilter">
     <table class="table-hover">
         <thead>
         <tr>
             <th>
                 <div>
                     <label for="Country">Country</label>
-                    <InputSelect class="form-select" id="Country" @bind-Value="_filter.Country" @oninput="FindCities">
+                    <InputSelect class="form-select" id="Country" @bind-Value="_advertisementFilter.Country" @oninput="FindCities">
                         @if (_countries == null)
                         {
                             <option value="">Loading...</option>
@@ -34,7 +34,7 @@
             <th>
                 <div>
                     <label for="City">City</label>
-                    <InputSelect class="form-select" id="City" @bind-Value="_filter.City" disabled="@_isCityDisabled">
+                    <InputSelect class="form-select" id="City" @bind-Value="_advertisementFilter.City" disabled="@_isCityDisabled">
                         @if (_cities == null)
                         {
                             <option value="">Loading...</option>
@@ -60,31 +60,31 @@
             <th>
                 <div>
                     <label for="Area">Area</label>
-                    <InputText class="form-control" id="Area" @bind-Value="_filter.Area"></InputText>
+                    <InputText class="form-control" id="Area" @bind-Value="_advertisementFilter.Area"></InputText>
                 </div>
             </th>
             <th>
                 <div>
                     <label for="Rooms">Rooms</label>
-                    <InputNumber class="form-control" id="Rooms" @bind-Value="_filter.Rooms"></InputNumber>
+                    <InputNumber class="form-control" id="Rooms" @bind-Value="_advertisementFilter.Rooms"></InputNumber>
                 </div>
             </th>
             <th>
                 <div>
                     <label for="Square">Square from:</label>
-                    <InputNumber class="form-control" id="Square" @bind-Value="_filter.Square"></InputNumber>
+                    <InputNumber class="form-control" id="Square" @bind-Value="_advertisementFilter.Square"></InputNumber>
                 </div>
             </th>
             <th>
                 <div>
                     <label for="Price">Price to:</label>
-                    <InputNumber class="form-control" id="Price" @bind-Value="_filter.Price"></InputNumber>
+                    <InputNumber class="form-control" id="Price" @bind-Value="_advertisementFilter.Price"></InputNumber>
                 </div>
             </th>
             <th>
                 <div>
                     <label for="CreatedDate">Not before:</label>
-                    <InputDate class="form-control" id="CreatedDate" @bind-Value="_filter.CreatedDate"></InputDate>
+                    <InputDate class="form-control" id="CreatedDate" @bind-Value="_advertisementFilter.CreatedDate"></InputDate>
                 </div>
             </th>
         </tr>
@@ -134,7 +134,7 @@ else
                 <td>@ad.Area</td>
                 <td>@ad.Title</td>
                 <td>@ad.Price</td>
-            <td><a href="/ads/@ad.Id"><button class="btn btn-info auto-width"><i class="bi bi-three-dots"></i></button></a></td>
+            <td><a href="/advertisements/@ad.Id"><button class="btn btn-info auto-width"><i class="bi bi-three-dots"></i></button></a></td>
             </tr>
         }
         </tbody>
@@ -151,27 +151,20 @@ else
     [SupplyParameterFromQuery(Name = "City")]
     public string? City { get; set; }
     
-    IList<AdDto>? _ads;
+    IList<AdvertisementDto>? _ads;
     List<string>? _countries;
     bool _isCityDisabled;
     List<string>? _cities;
-    FilterDtoInput _filter = new();
+    AdvertisementFilterDto _advertisementFilter = new();
 
     protected override async Task OnInitializedAsync()
     {
-        if (string.IsNullOrEmpty(Country) && string.IsNullOrEmpty(City))
-        {
-            _isCityDisabled = true;
-            _ads = await AdService.GetListAsync();
-        }
-        else
-        {   
-            _isCityDisabled = false;
-            _filter.Country = Country;
-            _filter.City = City;
-            
-            _ads = await AdService.GetFilteredListAsync(_filter);
-        }
+        _advertisementFilter.Country = Country;
+        _advertisementFilter.City = City;
+        
+        _ads = await AdvertisementService.GetListAsync(_advertisementFilter);
+
+        _isCityDisabled = string.IsNullOrEmpty(Country);
         
         await FindCountriesAsync();
         InitCities();
@@ -179,15 +172,15 @@ else
 
     private async Task FindAsync()
     {
-        _ads = await AdService.GetFilteredListAsync(_filter);
+        _ads = await AdvertisementService.GetListAsync(_advertisementFilter);
     }
     
     private async Task RemoveFilterAsync()
     {
-        _filter = new FilterDtoInput();
+        _advertisementFilter = new AdvertisementFilterDto();
         _isCityDisabled = true;
         
-        _ads = await AdService.GetListAsync();
+        _ads = await AdvertisementService.GetListAsync(_advertisementFilter);
     }
     
     void InitCities()
@@ -206,7 +199,7 @@ else
 
     private void FindCities(ChangeEventArgs e)
     {
-        _filter.City = "";
+        _advertisementFilter.City = "";
         
         _isCityDisabled = e.Value.Equals("");
         if (_isCityDisabled) return;

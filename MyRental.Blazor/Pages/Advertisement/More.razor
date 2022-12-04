@@ -1,6 +1,6 @@
-﻿@page "/ads/{Id:int}"
+﻿@page "/advertisements/{Id:int}"
 
-@inject IAdService AdService
+@inject IAdvertisementService AdvertisementService
 
 <PageTitle>More</PageTitle>
 
@@ -67,7 +67,7 @@ else
     <br/>
     <br/>
     
-    <a href="/ads"><button class="btn btn-info auto-width"><i class="bi bi-arrow-bar-left"></i></button></a>
+    <a href="/advertisements"><button class="btn btn-info auto-width"><i class="bi bi-arrow-bar-left"></i></button></a>
 }
 
 
@@ -76,12 +76,12 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    AdDto? _ad;
+    AdvertisementDto? _ad;
     int _currentMedia;
     
     protected override async Task OnInitializedAsync()
     {
-        _ad = await AdService.GetByIdAsync(Id);
+        _ad = await AdvertisementService.GetByIdAsync(Id);
     }
 
     private void ShowPreviousMedia()

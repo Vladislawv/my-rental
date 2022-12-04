@@ -1,8 +1,8 @@
 ﻿using MyRental.Services.Areas.Medias.Dto;
 
-namespace MyRental.Services.Areas.Ads.Dto;
+namespace MyRental.Services.Areas.Advertisements.Dto;
 
-public class AdDto : EntityDto
+public class AdvertisementDto : EntityDto
 {
     public int UserId { get; set; }
     public ICollection<MediaDto> Medias { get; set; }

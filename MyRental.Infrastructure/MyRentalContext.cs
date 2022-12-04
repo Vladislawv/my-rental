@@ -11,7 +11,7 @@ public class MyRentalContext : IdentityDbContext<User, Role, int, IdentityUserCl
 {
     private readonly ISeeder<Role> _rolesSeeder;
     public DbSet<MediaFile> Medias { get; set; }
-    public DbSet<Advertisement> Ads { get; set; }
+    public DbSet<Advertisement> Advertisements { get; set; }
     public DbSet<Mail> Mailing { get; set; }
 
     public MyRentalContext(DbContextOptions<MyRentalContext> options, ISeeder<Role> rolesSeeder) : base(options)

@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +10,7 @@ namespace MyRental.Api.Controllers;
 [ApiController]
 [Route("api/ping")]
 [Produces(MediaTypeNames.Application.Json)]
+[Authorize(Roles = "Admin")]
 public class PingController : ControllerBase
 {
     /// <summary>
@@ -18,7 +18,6 @@ public class PingController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public Task<IActionResult> PingAsync()
     {
