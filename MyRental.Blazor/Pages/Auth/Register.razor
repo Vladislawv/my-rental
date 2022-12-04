@@ -57,12 +57,12 @@
 
     private async void RegisterAsync()
     {
-        var result = await new UserDtoInputValidator(UserService)
+        var validationResult = await new UserDtoInputValidator(UserService)
             .ValidateAsync(_userInput);
 
-        if (!result.IsValid)
+        if (!validationResult.IsValid)
         {
-            var message = result.Errors
+            var message = validationResult.Errors
                 .Aggregate("", (current, error) => current + error.ErrorMessage);
 
             throw new Exception(message);
