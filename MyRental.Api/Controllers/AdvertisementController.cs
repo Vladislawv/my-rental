@@ -1,5 +1,4 @@
 ﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyRental.Services.Areas.Advertisements;
@@ -60,7 +59,7 @@ public class AdvertisementController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(AdvertisementDto), StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     public async Task<IActionResult> CreateAsync([FromBody] AdvertisementDtoInput advertisementInput)
     {
         var advertisementId = await _advertisementService.CreateAsync(advertisementInput);
@@ -77,7 +76,7 @@ public class AdvertisementController : ControllerBase
     /// <returns></returns>
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(AdvertisementDto), StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     public async Task<IActionResult> UpdateByIdAsync([FromRoute] int id, 
         [FromBody] AdvertisementDtoInput advertisementInput)
     {
@@ -94,7 +93,7 @@ public class AdvertisementController : ControllerBase
     /// <returns></returns>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     public async Task<IActionResult> DeleteByIdAsync([FromRoute] int id)
     {
         await _advertisementService.DeleteByIdAsync(id);
