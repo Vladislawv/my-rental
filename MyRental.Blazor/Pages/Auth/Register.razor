@@ -1,6 +1,7 @@
 ﻿@page "/auth/register"
 
 @inject NavigationManager NavigationManager
+@inject IJSRuntime Js
 @inject IUserService UserService
 @inject IAuthService AuthService
 
@@ -57,19 +58,26 @@
 
     private async void RegisterAsync()
     {
-        var validationResult = await new UserDtoInputValidator(UserService)
-            .ValidateAsync(_userInput);
-
-        if (!validationResult.IsValid)
+        try
         {
-            var message = validationResult.Errors
-                .Aggregate("", (current, error) => current + error.ErrorMessage);
+            var validationResult = await new UserDtoInputValidator(UserService)
+                .ValidateAsync(_userInput);
 
-            throw new Exception(message);
+            if (!validationResult.IsValid)
+            {
+                var message = validationResult.Errors
+                    .Aggregate("", (current, error) => current + error.ErrorMessage);
+
+                throw new Exception(message);
+            }
+
+            await AuthService.RegisterAsync(_isSubscribed, _userInput);
+            
+            NavigationManager.NavigateTo("/auth/login");
         }
-
-        await AuthService.RegisterAsync(_isSubscribed, _userInput);
-        
-        NavigationManager.NavigateTo("/auth/login");
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
     }
 }

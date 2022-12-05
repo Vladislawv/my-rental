@@ -193,15 +193,15 @@
                 var message = result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage);
                 throw new Exception(message);
             }
+            
             await AdvertisementService.UpdateByIdAsync(AdvertisementId, _advertisementInput);
+            
+            NavManager.NavigateTo("/user/account");
         }
         catch (Exception e)
         {
             await Js.InvokeVoidAsync("alert", e.Message);
-            return;
         }
-        
-        NavManager.NavigateTo("/user/account");
     }
     
     async Task OnFileChangeAsync(InputFileChangeEventArgs e)

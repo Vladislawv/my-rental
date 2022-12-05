@@ -76,13 +76,12 @@
             }
             
             await UserService.UpdateByIdAsync(Id, _userInput);
+            
+            NavManager.NavigateTo("/user/account");
         }
         catch (Exception e)
         {
             await Js.InvokeVoidAsync("alert", e.Message);
-            return;
         }
-
-        NavManager.NavigateTo("/user/account");
     }
 }

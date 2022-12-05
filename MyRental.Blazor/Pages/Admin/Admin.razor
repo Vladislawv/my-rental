@@ -42,7 +42,15 @@
 
     private async Task NotifyAsync()
     {
-        await NotificationService.NotifyAsync(_letter);
-        await Js.InvokeVoidAsync("alert", "Successfully!");
+        try
+        {
+            await NotificationService.NotifyAsync(_letter);
+            
+            await Js.InvokeVoidAsync("alert", "Successfully!");
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
     }
 }

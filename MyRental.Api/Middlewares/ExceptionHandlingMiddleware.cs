@@ -34,9 +34,9 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            await HandleExceptionAsync(ex, context);
+            await HandleExceptionAsync(e, context);
         }
     }
 
