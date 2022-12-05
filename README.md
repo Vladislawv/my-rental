@@ -16,8 +16,8 @@ Blazor project contains ready to go web-site  with all functionality of applicat
 
 ### What must be installed
 - .NET 6
-- Microsoft SQL Server database
-  - Be sure your database exist
+- Microsoft SQL Server
+  - Created database
 
 ### How to install and run
 1) Download/Clone the solution from repository
