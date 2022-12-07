@@ -246,7 +246,7 @@ namespace MyRental.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "3afc091e-28cd-4f07-a93b-568f50c55ac5",
+                            ConcurrencyStamp = "1e17cafc-1bfe-4143-8854-5f37c5769786",
                             Name = "Admin",
                             NormalizedName = "Admin",
                             Type = 1
@@ -254,7 +254,7 @@ namespace MyRental.Infrastructure.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "4c6770d1-a485-4128-8af8-7605f96630ae",
+                            ConcurrencyStamp = "d2de790a-beae-4d10-afc9-4d25e6bcb293",
                             Name = "User",
                             NormalizedName = "User",
                             Type = 2
