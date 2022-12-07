@@ -1,0 +1,111 @@
+﻿@inherits LayoutComponentBase
+
+@inject AuthenticationStateProvider AuthProvider
+@inject IJSRuntime Js
+@inject INotificationService NotificationService
+
+<PageTitle>MyRental.Blazor</PageTitle>
+
+<div class="wrapper">
+    <header>
+        <a href="/"><img src="images/logo.png" alt="My Rental" width="90" height="90"/></a>
+        <ul>
+            <AuthorizeView Roles="Admin">
+                <li><a href="/admin"><i class="bi bi-laptop"></i>Admin</a></li>
+            </AuthorizeView>
+            
+            <AuthorizeView>
+                <Authorized>
+                    <li><a href="/user/account"><i class="bi bi-house-fill"></i>Account</a></li>
+                    <li><a @onclick="Logout" href="javascript:void(0)"><i class="bi bi-door-closed-fill"></i>Logout</a></li>
+                </Authorized>
+    
+                <NotAuthorized>
+                    <li><a href="/auth/register"><i class="bi bi-door-open"></i>Register</a></li>
+                    <li><a href="/auth/login"><i class="bi bi-door-open"></i>Login</a></li>
+                </NotAuthorized>
+            </AuthorizeView>
+        </ul>
+    </header>
+    
+    <main>
+        <article class="content px-4">
+            <ErrorBoundary>
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent>
+                    @HandleExceptionAsync();
+                </ErrorContent>
+            </ErrorBoundary>
+        </article>
+    </main>
+    
+    <footer class="text-center">
+        <h3>Subscribe to newsletter</h3>
+        
+        <EditForm class="mb-5" Model="_email">
+            <div>
+                <label for="Email">Write your email here</label>
+                <InputText class="form-control w-16" id="Email" @bind-Value="_email"></InputText>
+                <button class="btn btn-success m-d-4 m-l-20" @onclick="SubscribeToNotificationsAsync">Subscribe</button>
+                <button class="btn btn-danger m-d-4 m-l-20" @onclick="UnsubscribeFromNotificationsAsync">Unsubscribe</button>
+            </div>
+        </EditForm>
+    </footer>
+</div>
+
+@code{
+    string _email = "";
+
+    private async Task SubscribeToNotificationsAsync()
+    {
+        try
+        {
+            var result = await new EmailValidator()
+                .ValidateAsync(_email);
+            
+            if (!result.IsValid) throw new Exception("Invalid email.");
+            
+            await NotificationService.SubscribeToNotificationsAsync(_email);
+
+            await NotificationService.NotifyOfSubscribeAsync(_email);
+            
+            await Js.InvokeVoidAsync("alert", "Successfully!");
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+    
+    private async Task UnsubscribeFromNotificationsAsync()
+    {
+        try
+        {
+            var result = await new EmailValidator()
+                .ValidateAsync(_email);
+            
+            if (!result.IsValid) throw new Exception("Invalid email");
+            
+            await NotificationService.UnsubscribeFromNotificationsAsync(_email);
+            
+            await Js.InvokeVoidAsync("alert", "Successfully!");
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+    
+    private async Task Logout()
+    {
+        var myProvider = (MyAuthenticationStateProvider)AuthProvider;
+        await myProvider.LogoutAsync();
+    }
+
+    private async Task HandleExceptionAsync()
+    {
+        await Js.InvokeVoidAsync("alert", "Sorry, something went wrong.");
+    }
+}

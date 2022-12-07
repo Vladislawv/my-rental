@@ -1,0 +1,83 @@
+﻿@page "/auth/register"
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime Js
+@inject IUserService UserService
+@inject IAuthService AuthService
+
+<PageTitle>Register</PageTitle>
+
+<div class="text-center">
+    <h1>Sign Up</h1>
+    <h4>It takes a minute</h4>
+    <br/>
+
+    <EditForm Model="_userInput">
+        <div>
+            <label for="UserName">Name</label>
+            <InputText class="form-control" id="UserName" @bind-Value="_userInput.UserName"></InputText>
+        </div>
+        <div>
+            <label for="Email">Email</label>
+            <InputText class="form-control" id="Email" @bind-Value="_userInput.Email"></InputText>
+        </div>
+        <div>
+            <label for="PhoneNumber">Phone</label>
+            <InputText class="form-control" id="PhoneNumber" @bind-Value="_userInput.PhoneNumber"></InputText>
+        </div>
+        <div>
+            <label for="Password">Password</label>
+            <InputText class="form-control" id="Password" @bind-Value="_userInput.Password"></InputText>
+        </div>
+        <div>
+            <label for="Subscribe">Subscribe to Newsletter</label>
+            <InputCheckbox class="form-check" id="Subscribe" @bind-Value="_isSubscribed"></InputCheckbox>
+        </div>
+    </EditForm>
+    <br/>
+    <br/>
+
+    <a href="/">
+        <button class="btn btn-info auto-width">
+            <i class="bi bi-arrow-bar-left"></i>
+        </button>
+    </a>
+    <button class="btn btn-success auto-width" @onclick="RegisterAsync">
+        <i class="bi bi-check-square"></i>
+    </button>
+    <br/>
+    <br/>
+
+    <p>Already have an account? <a class="link-info" href="/auth/login">Login here</a></p>
+</div>
+
+@code
+{
+    readonly UserDtoInput _userInput = new();
+    bool _isSubscribed;
+
+    private async void RegisterAsync()
+    {
+        try
+        {
+            var validationResult = await new UserDtoInputValidator(UserService)
+                .ValidateAsync(_userInput);
+
+            if (!validationResult.IsValid)
+            {
+                var message = validationResult.Errors
+                    .Aggregate("", (current, error) => current + error.ErrorMessage);
+
+                throw new Exception(message);
+            }
+
+            await AuthService.RegisterAsync(_isSubscribed, _userInput);
+            
+            NavigationManager.NavigateTo("/auth/login");
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+}

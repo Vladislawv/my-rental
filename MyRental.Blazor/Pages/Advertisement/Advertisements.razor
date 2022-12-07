@@ -1,0 +1,212 @@
+﻿@page "/advertisements"
+
+@inject IAdvertisementService AdvertisementService
+
+<PageTitle>Advertisements</PageTitle>
+
+<h2>Here you can found ads by more filters</h2>
+<br/>
+
+
+<EditForm Model="_advertisementFilter">
+    <table class="table-hover">
+        <thead>
+        <tr>
+            <th>
+                <div>
+                    <label for="Country">Country</label>
+                    <InputSelect class="form-select" id="Country" @bind-Value="_advertisementFilter.Country" @oninput="FindCities">
+                        @if (_countries == null)
+                        {
+                            <option value="">Loading...</option>
+                        }
+                        else
+                        {
+                            <option value="">Countries</option>
+                            @foreach (var country in _countries)
+                            {
+                                <option value="@country">@country</option>
+                            }
+                        }
+                    </InputSelect>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <label for="City">City</label>
+                    <InputSelect class="form-select" id="City" @bind-Value="_advertisementFilter.City" disabled="@_isCityDisabled">
+                        @if (_cities == null)
+                        {
+                            <option value="">Loading...</option>
+                        }
+                        else
+                        {
+                            @if (_isCityDisabled)
+                            {
+                                <option value="">Choose country</option>
+                            }
+                            else
+                            {
+                                <option value="">Cities</option>
+                                foreach (var city in _cities)
+                                {
+                                    <option value="@city">@city</option>
+                                }
+                            }
+                        }
+                    </InputSelect>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <label for="Area">Area</label>
+                    <InputText class="form-control" id="Area" @bind-Value="_advertisementFilter.Area"></InputText>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <label for="Rooms">Rooms</label>
+                    <InputNumber class="form-control" id="Rooms" @bind-Value="_advertisementFilter.Rooms"></InputNumber>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <label for="Square">Square from:</label>
+                    <InputNumber class="form-control" id="Square" @bind-Value="_advertisementFilter.Square"></InputNumber>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <label for="Price">Price to:</label>
+                    <InputNumber class="form-control" id="Price" @bind-Value="_advertisementFilter.Price"></InputNumber>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <label for="CreatedDate">Not before:</label>
+                    <InputDate class="form-control" id="CreatedDate" @bind-Value="_advertisementFilter.CreatedDate"></InputDate>
+                </div>
+            </th>
+        </tr>
+        </thead>
+                
+        <br/>
+        <br/>
+    </table>
+
+    <div class="text-center">
+        <a href="/"><button class="btn btn-info"><i class="bi bi-arrow-bar-left"></i></button></a>
+        <button class="btn btn-success" @onclick="FindAsync"><i class="bi bi-search"></i></button>
+        <button class="btn btn-danger" @onclick="RemoveFilterAsync"><i class="bi bi-trash-fill"></i></button>
+    </div>
+    
+    <br/>
+</EditForm>
+
+@if (_advertisements == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Photos</th>
+            <th>Area</th>
+            <th>Title</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var ad in _advertisements)
+        {
+            <tr>
+                <td class="p-0">
+                    @if (ad.Medias != null && ad.Medias.Any())
+                    {
+                        <img src="@ad.Medias.ElementAt(0).Data" alt="Photo" />
+                    }
+                </td>
+                <td>@ad.Area</td>
+                <td>@ad.Title</td>
+                <td>@ad.Price</td>
+            <td><a href="/advertisements/@ad.Id"><button class="btn btn-info auto-width"><i class="bi bi-three-dots"></i></button></a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code
+{
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "Country")]
+    public string? Country { get; set; }
+    
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "City")]
+    public string? City { get; set; }
+    
+    IList<AdvertisementDto>? _advertisements;
+    List<string>? _countries;
+    bool _isCityDisabled;
+    List<string>? _cities;
+    AdvertisementFilterDto _advertisementFilter = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _advertisementFilter.Country = Country;
+        _advertisementFilter.City = City;
+        
+        _advertisements = await AdvertisementService.GetListAsync(_advertisementFilter);
+
+        _isCityDisabled = string.IsNullOrEmpty(Country);
+        
+        await FindCountriesAsync();
+        InitCities();
+    }
+
+    private async Task FindAsync()
+    {
+        _advertisements = await AdvertisementService.GetListAsync(_advertisementFilter);
+    }
+    
+    private async Task RemoveFilterAsync()
+    {
+        _advertisementFilter = new AdvertisementFilterDto();
+        _isCityDisabled = true;
+        
+        _advertisements = await AdvertisementService.GetListAsync(_advertisementFilter);
+    }
+    
+    void InitCities()
+    {
+        _cities = File.ReadLines("D:\\Programming\\Projects\\my-rental\\MyRental.Infrastructure\\Enums\\Cities.txt")
+            .Where(city => city.EndsWith($"{Country}"))
+            .OrderBy(city => city[0])
+            .ToList();
+    }
+    
+    private async Task FindCountriesAsync()
+    {
+        var countries = await File.ReadAllLinesAsync("D:\\Programming\\Projects\\my-rental\\MyRental.Infrastructure\\Enums\\Countries.txt");
+        _countries = countries.ToList();
+    }
+
+    private void FindCities(ChangeEventArgs e)
+    {
+        _advertisementFilter.City = "";
+        
+        _isCityDisabled = e.Value.Equals("");
+        if (_isCityDisabled) return;
+
+        _cities = File.ReadLines("D:\\Programming\\Projects\\my-rental\\MyRental.Infrastructure\\Enums\\Cities.txt")
+            .Where(city => city.EndsWith($"{e.Value}"))
+            .OrderBy(city => city[0])
+            .ToList();
+    }
+}

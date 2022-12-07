@@ -1,0 +1,57 @@
+﻿@page "/auth/login"
+
+@inject ILocalStorageService LocalStorageService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime Js
+@inject IAuthService AuthService
+@inject NavigationManager NavManager
+
+<PageTitle>Login</PageTitle>
+
+<div class="text-center">
+    <h1>Login</h1>
+    <br/>
+    
+    <EditForm Model="_login">
+        <div>
+            <label for="Login">Email</label>
+            <InputText class="form-control" id="Login" @bind-Value="_login.Email"></InputText>
+        </div>
+        <div>
+            <label for="Password">Password</label>
+            <InputText class="form-control" id="Password" @bind-Value="_login.Password"></InputText>
+        </div>
+    </EditForm>
+    <br/>
+    <br/>
+    
+    <a href="/"><button class="btn btn-info auto-width"><i class="bi bi-arrow-bar-left"></i></button></a>
+    <button class="btn btn-success auto-width" @onclick="LoginAsync"><i class="bi bi-check-square"></i></button>
+    <br/>
+    <br/>
+    
+    <p>Don`t have an account? <a class="link-info" href="/auth/register">Register here</a></p>
+</div>
+
+@code
+{
+    readonly LoginDto _login = new();
+
+    private async void LoginAsync()
+    {
+        try
+        {
+            var jwt = await AuthService.LoginAsync(_login);
+            
+            await LocalStorageService.SetItemAsync("Jwt", jwt);
+        
+            await AuthStateProvider.GetAuthenticationStateAsync();
+            
+            NavManager.NavigateTo("/user/account", true);
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+}

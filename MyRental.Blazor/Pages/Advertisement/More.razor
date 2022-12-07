@@ -1,0 +1,96 @@
+﻿@page "/advertisements/{Id:int}"
+
+@inject IAdvertisementService AdvertisementService
+
+<PageTitle>More</PageTitle>
+
+@if (_advertisement == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    @if (_advertisement.Medias.Any())
+    {
+        <table class="table-hover">
+            <thead class="custom">
+            <tr>
+                <th>
+                    <img src="@_advertisement.Medias.ElementAt(_currentMedia).Data" alt="Photo"/>
+                </th>
+            </tr>
+            </thead>
+            
+            <tbody>
+            <tr>
+                <td>
+                    <button class="btn btn-info" @onclick="ShowPreviousMedia"><i class="bi bi-arrow-left-circle-fill"></i></button>
+                    <button class="btn btn-info" @onclick="ShowNextMedia"><i class="bi bi-arrow-right-circle-fill"></i></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <br/>
+        <br/>
+    }
+
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Country</th>
+            <th>City</th>
+            <th>Area</th>
+            <th>Title</th>
+            <th>Rooms</th>
+            <th>Square</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Updated</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>@_advertisement.Country</td>
+            <td>@_advertisement.City</td>
+            <td>@_advertisement.Area</td>
+            <td>@_advertisement.Title</td>
+            <td>@_advertisement.Rooms</td>
+            <td>@_advertisement.Square</td>
+            <td>@_advertisement.Price</td>
+            <td>@_advertisement.Description</td>
+            <td>@_advertisement.CreatedDate.ToShortDateString()</td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+    <br/>
+    
+    <a href="/advertisements"><button class="btn btn-info auto-width"><i class="bi bi-arrow-bar-left"></i></button></a>
+}
+
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    AdvertisementDto? _advertisement;
+    int _currentMedia;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _advertisement = await AdvertisementService.GetByIdAsync(Id);
+    }
+
+    private void ShowPreviousMedia()
+    {
+        _currentMedia = _currentMedia == 0 ? _advertisement.Medias.Count - 1 : _currentMedia -= 1;
+    }
+
+    private void ShowNextMedia()
+    {
+        _currentMedia = _currentMedia == _advertisement.Medias.Count - 1 ? 0 : _currentMedia += 1;
+    }
+}

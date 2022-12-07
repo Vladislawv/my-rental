@@ -1,0 +1,274 @@
+﻿@page "/advertisements/edit/{UserId:int}/{AdvertisementId:int}"
+
+@attribute [Authorize]
+
+@inject IJSRuntime Js
+@inject NavigationManager NavManager
+@inject IMapper Mapper
+@inject IAdvertisementService AdvertisementService
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+<br/>
+
+<EditForm Model="_advertisementInput">
+    <div class="text-center">
+        @if (_advertisementInput.Medias != null && _advertisementInput.Medias.Any())
+        {
+            <table class="table-hover">
+                <thead class="custom">
+                <tr>
+                    <th>
+                        <img src="@_advertisementInput.Medias.ElementAt(_currentMedia).Data" alt="Photo"/>
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>
+                        <button class="btn btn-info" @onclick="ShowPreviousMedia"><i class="bi bi-arrow-left-circle-fill"></i></button>
+                        <button class="btn btn-danger" @onclick="() => DeleteFile(_currentMedia)"><i class="bi bi-trash-fill"></i></button>
+                        <button class="btn btn-info" @onclick="ShowNextMedia"><i class="bi bi-arrow-right-circle-fill"></i></button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        }
+        
+        <table class="table-hover w-100">
+            <thead>
+            <tr>
+                <th>
+                    <div>
+                        <label for="Image">Images</label>
+                        <InputFile class="form-control" id="Image" OnChange="OnFileChangeAsync"></InputFile>
+                    </div>
+                </th>
+                <th>
+                    <div>
+                        <label for="Country">Country</label>
+                        <InputSelect class="form-select text-start" id="Country" @bind-Value="_advertisementInput.Country" @oninput="FindCities">
+                            @if (_countries == null)
+                            {
+                                <option value="">Loading...</option>
+                            }
+                            else
+                            {
+                                <option value="">Countries</option>
+                                foreach (var country in _countries)
+                                {
+                                    <option value="@country">@country</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                </th>
+                <th>
+                    <div>
+                        <label for="City">City</label>
+                        <InputSelect class="form-select text-start" id="City" @bind-Value="_advertisementInput.City" disabled="@_isCityDisabled">
+                            @if (_cities == null)
+                            {
+                                <option value="">Loading...</option>
+                            }
+                            else
+                            {
+                                @if (_isCityDisabled)
+                                {
+                                    <option value="">Choose country</option>
+                                }
+                                else
+                                {
+                                    <option value="">Cities</option>
+                                    @foreach (var city in _cities)
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                </th>
+                <th>
+                    <div>
+                        <label for="Area">Area</label>
+                        <InputText class="form-control" id="Area" @bind-Value="_advertisementInput.Area"></InputText>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+        </table>
+        
+        <table class="table-hover w-100">
+            <thead>
+            <tr>
+                <th>
+                    <div>
+                        <label for="Rooms">Rooms</label>
+                        <InputNumber class="form-control" id="Rooms" @bind-Value="_advertisementInput.Rooms"></InputNumber>
+                    </div>
+                </th>
+                <th>
+                    <div>
+                        <label for="Square">Square</label>
+                        <InputNumber class="form-control" id="Square" @bind-Value="_advertisementInput.Square"></InputNumber>
+                    </div>
+                </th>
+                <th>
+                    <div>
+                        <label for="Price">Price</label>
+                        <InputNumber class="form-control" id="Price" @bind-Value="_advertisementInput.Price"></InputNumber>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+        </table>
+        
+        <table class="table-hover w-100">
+            <thead>
+            <tr>
+                <th>
+                    <div>
+                        <label for="Title">Title</label>
+                        <InputTextArea class="form-control w-100" id="Title" @bind-Value="_advertisementInput.Title"></InputTextArea>
+                    </div>
+                </th>
+                <th>
+                    <div>
+                        <label for="Description">Description</label>
+                        <InputTextArea class="form-control w-100" id="Description" @bind-Value="_advertisementInput.Description"></InputTextArea>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+        </table>
+        <br/>
+        <br/>
+        
+        <div class="text-center">
+            <a href="/user/account"><button class="btn btn-info auto-width"><i class="bi bi-arrow-bar-left"></i></button></a>
+            <button class="btn btn-primary auto-width" @onclick="UpdateAsync"><i class="bi bi-pencil-square"></i></button>
+        </div>
+    </div>
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public int UserId { get; set; }
+    
+    [Parameter]
+    public int AdvertisementId { get; set; }
+
+    readonly AdvertisementDtoInput _advertisementInput = new();
+    AdvertisementDto? _advertisementDto;
+    List<string>? _countries;
+    List<string>? _cities;
+    bool _isCityDisabled;
+    int _currentMedia;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _advertisementDto = await AdvertisementService.GetByIdAsync(AdvertisementId);
+        Mapper.Map(_advertisementDto, _advertisementInput);
+
+        await FindCountriesAsync();
+        InitCities();
+
+        _currentMedia = 0;
+    }
+
+    private async Task UpdateAsync()
+    {
+        try
+        {
+            _advertisementInput.UserId = UserId;
+            _advertisementInput.CreatedDate = DateTime.Now;
+
+            var result = await new AdvertisementDtoInputValidator().ValidateAsync(_advertisementInput);
+            if (!result.IsValid)
+            {
+                var message = result.Errors.Aggregate("", (current, error) => current + error.ErrorMessage);
+                throw new Exception(message);
+            }
+            
+            await AdvertisementService.UpdateByIdAsync(AdvertisementId, _advertisementInput);
+            
+            NavManager.NavigateTo("/user/account");
+        }
+        catch (Exception e)
+        {
+            await Js.InvokeVoidAsync("alert", e.Message);
+        }
+    }
+    
+    async Task OnFileChangeAsync(InputFileChangeEventArgs e)
+    {
+        var format = e.File.ContentType;
+        var resizedImage = await e.File.RequestImageFileAsync(format, 350, 250);
+        var buffer = new byte[resizedImage.Size];
+        await resizedImage.OpenReadStream().ReadAsync(buffer);
+        var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+
+        var nameAndExtension = e.File.Name.Split(".");
+
+        var file = new MediaDtoInput
+        {
+            AdvertisementId = AdvertisementId,
+            Data = imageData,
+            Name = nameAndExtension[0],
+            Extension = nameAndExtension[1]
+        };
+        
+        _advertisementInput.Medias.Add(file);
+
+        _currentMedia = _advertisementInput.Medias.Count - 1;
+    }
+
+    void DeleteFile(int id)
+    {
+        var file = _advertisementInput.Medias.ElementAt(id);
+        _advertisementInput.Medias.Remove(file);
+
+        ShowPreviousMedia();
+    }
+    
+    private void InitCities()
+    {
+        _cities = File.ReadLines("D:\\Programming\\Projects\\my-rental\\MyRental.Infrastructure\\Enums\\Cities.txt")
+            .Where(city => city.EndsWith($"{_advertisementDto.Country}"))
+            .OrderBy(city => city[0])
+            .ToList();
+    }
+    
+    private async Task FindCountriesAsync()
+    {
+        var countries = await File.ReadAllLinesAsync("D:\\Programming\\Projects\\my-rental\\MyRental.Infrastructure\\Enums\\Countries.txt");
+        _countries = countries.ToList();
+    }
+
+    private void FindCities(ChangeEventArgs e)
+    {
+        _advertisementInput.City = "";
+        
+        _isCityDisabled = e.Value.Equals("");
+        if (_isCityDisabled) return;
+
+        _cities = File.ReadLines("D:\\Programming\\Projects\\my-rental\\MyRental.Infrastructure\\Enums\\Cities.txt")
+            .Where(city => city.EndsWith($"{e.Value}"))
+            .OrderBy(city => city[0])
+            .ToList();
+    }
+    
+    private void ShowPreviousMedia()
+    {
+        _currentMedia = _currentMedia == 0 ? _advertisementInput.Medias.Count - 1 : _currentMedia -= 1;
+    }
+
+    private void ShowNextMedia()
+    {
+        _currentMedia = _currentMedia == _advertisementInput.Medias.Count - 1 ? 0 : _currentMedia += 1;
+    }
+}
