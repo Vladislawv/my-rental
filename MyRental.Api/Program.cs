@@ -129,7 +129,6 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
-app.UseRouting();
 app.UseCors(cfg =>
 {
     cfg.AllowAnyOrigin();
@@ -140,7 +139,6 @@ app.UseCors(cfg =>
 app.UseAuthentication();
 app.UseAuthorization();
 
-// app.MapControllers();
-app.UseEndpoints(cfg => cfg.MapDefaultControllerRoute());
+app.MapControllers();
 
 app.Run();
