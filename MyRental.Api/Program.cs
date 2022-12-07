@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -22,7 +24,9 @@ using MyRental.Services.Areas.Users.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(config => config.Filters.Add<ValidateModelAttribute>());
+builder.Services.AddControllers(config => config.Filters.Add<ValidateModelAttribute>())
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true)
     .AddFluentValidation(configuration =>
@@ -76,6 +80,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddCors();
+
 builder.Services.AddAuthentication(x =>
     {
         x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -123,10 +129,18 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCors(cfg =>
+{
+    cfg.AllowAnyOrigin();
+    cfg.AllowAnyHeader();
+    cfg.AllowAnyMethod();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+// app.MapControllers();
+app.UseEndpoints(cfg => cfg.MapDefaultControllerRoute());
 
 app.Run();

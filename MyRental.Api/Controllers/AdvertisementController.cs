@@ -21,8 +21,9 @@ public class AdvertisementController : ControllerBase
     /// <summary>
     /// Get List of Advertisements
     /// </summary>
+    /// <param name="advertisementFilter"></param>
     /// <returns></returns>
-    [HttpGet("list")]
+    [HttpGet]
     [ProducesResponseType(typeof(IList<AdvertisementDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetListAsync([FromQuery] AdvertisementFilterDto advertisementFilter)
     {

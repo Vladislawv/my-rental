@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Notifications.Data;
+using MyRental.Services.Exceptions;
 
 namespace MyRental.Services.Areas.Notifications;
 
@@ -81,7 +82,7 @@ public class NotificationService : INotificationService
     {
         var existingMail = await GetMailByEmail(email);
 
-        if (existingMail != null) throw new Exception("This email is already subscribed!");
+        if (existingMail != null) throw new BadRequestException("This email is already subscribed!");
         
         var inputMail = new Mail { Email = email };
         
@@ -94,7 +95,7 @@ public class NotificationService : INotificationService
     public async Task UnsubscribeFromNotificationsAsync(string email)
     {
         var mail = await GetMailByEmail(email)
-            ?? throw new Exception("This email is not subscribing.");
+            ?? throw new BadRequestException("This email is not subscribed.");
 
         _context.Mailing
             .Remove(mail);

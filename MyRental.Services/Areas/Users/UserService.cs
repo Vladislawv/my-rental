@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Users.Dto;
+using MyRental.Services.Exceptions;
 using MyRental.Services.Handlers;
 
 namespace MyRental.Services.Areas.Users;
@@ -31,23 +32,19 @@ public class UserService : IUserService
         var user = await _userManager.Users
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(u => u.Id == id)
-                ?? throw new Exception($"User with Id:{id} is not found.");
+                ?? throw new NotFoundException($"User with Id:{id} is not found.");
         
         return user;
     }
     
     public async Task<UserDto> GetByLoginAsync(LoginDto login)
     {
-        if (string.IsNullOrEmpty(login.Email) || string.IsNullOrEmpty(login.Password)) 
-            throw new Exception("Input data is empty.");
-
         var user = await _userManager.Users
+            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(u => u.Email == login.Email)
-                ?? throw new Exception("This user is not found.");
-        
-        var isPasswordMatch = await _userManager.CheckPasswordAsync(user, login.Password);
+                ?? throw new NotFoundException("This user is not found.");
 
-        return isPasswordMatch ? _mapper.Map<UserDto>(user) : throw new Exception("Password is not match");
+        return user;
     }
     
     public async Task<int> CreateAsync(UserDtoInput userInput)
@@ -59,7 +56,7 @@ public class UserService : IUserService
         var user = _mapper.Map<User>(userInput);
         
         var result = await _userManager.CreateAsync(user, userInput.Password);
-        if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
+        if (!result.Succeeded) throw new BadRequestException(ErrorHandler.GetDescriptionByIdentityResult(result));
         
         await _userManager.AddToRoleAsync(user, "User");
         
@@ -71,7 +68,7 @@ public class UserService : IUserService
         var user = await _userManager.Users
             .Include(user => user.Advertisements)
             .FirstOrDefaultAsync(user => user.Id == id)
-                ?? throw new Exception($"User with Id:{id} is not found.");
+                ?? throw new NotFoundException($"User with Id:{id} is not found.");
 
         if (user.Email != userInput.Email) await CheckIfEmailIsFreeAsync(userInput.Email);
 
@@ -80,7 +77,7 @@ public class UserService : IUserService
         _mapper.Map(userInput, user);
         
         var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
+        if (!result.Succeeded) throw new BadRequestException(ErrorHandler.GetDescriptionByIdentityResult(result));
 
         await _userManager.RemovePasswordAsync(user);
         await _userManager.AddPasswordAsync(user, userInput.Password);
@@ -92,10 +89,10 @@ public class UserService : IUserService
     {
         var user = await _userManager.Users
             .FirstOrDefaultAsync(user => user.Id == id)
-                ?? throw new Exception($"User with Id:{id} is not found.");
+                ?? throw new NotFoundException($"User with Id:{id} is not found.");
 
         var result = await _userManager.DeleteAsync(user);
-        if (!result.Succeeded) throw new Exception(ErrorHandler.GetDescriptionByIdentityResult(result));
+        if (!result.Succeeded) throw new BadRequestException(ErrorHandler.GetDescriptionByIdentityResult(result));
     }
 
     public async Task<(bool Result, string ErrorMessage)> ValidatePasswordAsync(string password)
@@ -109,7 +106,7 @@ public class UserService : IUserService
     {
         var userWithSameEmail = await _userManager.FindByEmailAsync(email);
 
-        if (userWithSameEmail != null) throw new Exception("This email is already used.");
+        if (userWithSameEmail != null) throw new BadRequestException("This email is already used.");
     }
 
     private async Task CheckIfPhoneNumberIsFreeAsync(string phoneNumber)
@@ -117,6 +114,6 @@ public class UserService : IUserService
         var userWithSamePhoneNumber = await _userManager.Users
             .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
 
-        if (userWithSamePhoneNumber != null) throw new Exception("This Phone number is already taken.");
+        if (userWithSamePhoneNumber != null) throw new BadRequestException("This Phone number is already taken.");
     }
 }
