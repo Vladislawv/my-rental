@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Medias.Dto;
+using MyRental.Services.Exceptions;
 
 namespace MyRental.Services.Areas.Medias;
 
@@ -23,7 +24,7 @@ public class MediaService : IMediaService
         return await _context.Medias
             .ProjectTo<MediaDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(file => file.Id == id)
-                ?? throw new Exception($"File with Id:{id} is not found.");
+                ?? throw new NotFoundException($"File with Id:{id} is not found.");
     }
 
     public async Task<int> CreateAsync(MediaDtoInput mediaInput)
@@ -41,7 +42,7 @@ public class MediaService : IMediaService
     {
         var file = await _context.Medias
             .FirstOrDefaultAsync(file => file.Id == id)
-                ?? throw new Exception($"File with Id:{id} is not found.");
+                ?? throw new NotFoundException($"File with Id:{id} is not found.");
 
         _context.Medias.Remove(file);
         await _context.SaveChangesAsync();

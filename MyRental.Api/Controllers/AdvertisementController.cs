@@ -6,20 +6,13 @@ using MyRental.Services.Areas.Advertisements.Dto;
 
 namespace MyRental.Api.Controllers;
 
-/// <summary>
-/// Controller to manage Advertisement data
-/// </summary>
 [ApiController]
 [Route("api/advertisements")]
 [Produces(MediaTypeNames.Application.Json)]
 public class AdvertisementController : ControllerBase
 {
     private readonly IAdvertisementService _advertisementService;
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="advertisementService"></param>
+    
     public AdvertisementController(IAdvertisementService advertisementService)
     {
         _advertisementService = advertisementService;
@@ -28,8 +21,9 @@ public class AdvertisementController : ControllerBase
     /// <summary>
     /// Get List of Advertisements
     /// </summary>
+    /// <param name="advertisementFilter"></param>
     /// <returns></returns>
-    [HttpGet("list")]
+    [HttpGet]
     [ProducesResponseType(typeof(IList<AdvertisementDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetListAsync([FromQuery] AdvertisementFilterDto advertisementFilter)
     {

@@ -6,9 +6,6 @@ using MyRental.Services.Areas.Users.Dto;
 
 namespace MyRental.Api.Controllers;
 
-/// <summary>
-/// Controller to manage User data
-/// </summary>
 [ApiController]
 [Route("api/users")]
 [Produces(MediaTypeNames.Application.Json)]
@@ -17,10 +14,6 @@ public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
 
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="userService"></param>
     public UserController(IUserService userService)
     {
         _userService = userService;

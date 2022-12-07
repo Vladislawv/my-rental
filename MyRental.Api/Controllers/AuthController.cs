@@ -6,9 +6,6 @@ using MyRental.Services.Areas.Users.Dto;
 
 namespace MyRental.Api.Controllers;
 
-/// <summary>
-/// Controller for Authenticate and Authorization
-/// </summary>
 [ApiController]
 [Route("api/auth")]
 [Produces(MediaTypeNames.Application.Json)]
@@ -17,10 +14,6 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="authService"></param>
     public AuthController(IAuthService authService)
     {
         _authService = authService;
@@ -40,7 +33,6 @@ public class AuthController : ControllerBase
         
         return Ok();
     }
-    
     
     /// <summary>
     /// Login User
