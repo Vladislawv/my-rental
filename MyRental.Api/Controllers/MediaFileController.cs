@@ -6,9 +6,6 @@ using MyRental.Services.Areas.Medias.Dto;
 
 namespace MyRental.Api.Controllers;
 
-/// <summary>
-/// Controller to manage media-file data
-/// </summary>
 [ApiController]
 [Route("api/media-files")]
 [Produces(MediaTypeNames.Application.Json)]
@@ -17,10 +14,6 @@ public class MediaFileController : ControllerBase
 {
     private readonly IMediaService _mediaService;
 
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="mediaService"></param>
     public MediaFileController(IMediaService mediaService)
     {
         _mediaService = mediaService;

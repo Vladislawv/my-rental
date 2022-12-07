@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MyRental.Api.Controllers;
 
-/// <summary>
-/// Ping Controller
-/// </summary>
 [ApiController]
 [Route("api/ping")]
 [Produces(MediaTypeNames.Application.Json)]

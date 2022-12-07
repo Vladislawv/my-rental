@@ -6,20 +6,13 @@ using MyRental.Services.Areas.Advertisements.Dto;
 
 namespace MyRental.Api.Controllers;
 
-/// <summary>
-/// Controller to manage Advertisement data
-/// </summary>
 [ApiController]
 [Route("api/advertisements")]
 [Produces(MediaTypeNames.Application.Json)]
 public class AdvertisementController : ControllerBase
 {
     private readonly IAdvertisementService _advertisementService;
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="advertisementService"></param>
+    
     public AdvertisementController(IAdvertisementService advertisementService)
     {
         _advertisementService = advertisementService;

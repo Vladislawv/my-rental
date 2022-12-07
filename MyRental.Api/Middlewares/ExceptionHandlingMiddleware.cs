@@ -1,33 +1,24 @@
 ﻿using System.Net;
+using System.Net.Mime;
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using MyRental.Api.Dto;
+using MyRental.Services.Exceptions;
 
 namespace MyRental.Api.Middlewares;
 
-/// <summary>
-/// Class to handle exceptions
-/// </summary>
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlerMiddleware> _logger;
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="next"></param>
-    /// <param name="logger"></param>
+    private const string InternalServerErrorMessage = "Internal Server Error";
+    
     public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
     {
         _next = next;
         _logger = logger;
     }
-
-    /// <summary>
-    /// Handle exception and write response
-    /// </summary>
-    /// <param name="context"></param>
+    
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -43,16 +34,24 @@ public class ExceptionHandlingMiddleware
     private async Task HandleExceptionAsync(Exception ex, HttpContext context)
     {
         _logger.LogError(ex.Message);
-        var response = context.Response;
         
-        response.ContentType = "application/json";
-        response.StatusCode = (int) HttpStatusCode.InternalServerError;
+        var response = context.Response;
+        response.ContentType = MediaTypeNames.Application.Json;
+        
+        var errorDto = new ErrorDto();
 
-        ErrorDto errorDto = new()
+        if (ex is CustomException customException)
         {
-            ErrorMessage = ex.Message
-        };
-
+            response.StatusCode = (int)customException.ResponseStatusCode;
+            errorDto.ErrorMessage = customException.Message;
+            errorDto.AdditionalInfo = customException.ResponseAdditionalInfo;
+        }
+        else
+        {
+            response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            errorDto.ErrorMessage = InternalServerErrorMessage;
+        }
+        
         await response.WriteAsJsonAsync(errorDto, new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
 }

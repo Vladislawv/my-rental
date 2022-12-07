@@ -6,9 +6,6 @@ using MyRental.Services.Areas.Notifications.Data;
 
 namespace MyRental.Api.Controllers;
 
-/// <summary>
-/// Controller to subscribe/unsubscribe to notifications
-/// </summary>
 [ApiController]
 [Route("api/notifications")]
 [Produces(MediaTypeNames.Application.Json)]
@@ -16,10 +13,6 @@ public class NotificationController : ControllerBase
 {
     private readonly INotificationService _notificationService;
 
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="notificationService"></param>
     public NotificationController(INotificationService notificationService)
     {
         _notificationService = notificationService;

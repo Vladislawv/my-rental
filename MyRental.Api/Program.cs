@@ -3,6 +3,7 @@ using System.Text;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -23,8 +24,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(config => config.Filters.Add<ValidateModelAttribute>());
 
-builder.Services.AddFluentValidation(configuration =>
-    configuration.RegisterValidatorsFromAssembly(typeof(ValidationRuleBuilderExtensions).Assembly));
+builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true)
+    .AddFluentValidation(configuration =>
+        configuration.RegisterValidatorsFromAssembly(typeof(ValidationRuleBuilderExtensions).Assembly));
 
 builder.Services.AddDbContext<MyRentalContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyRentalDatabase")));
