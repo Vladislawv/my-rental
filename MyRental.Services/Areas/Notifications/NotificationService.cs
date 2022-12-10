@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MyRental.Infrastructure;
 using MyRental.Infrastructure.Entities;
 using MyRental.Services.Areas.Notifications.Data;
@@ -10,12 +11,16 @@ namespace MyRental.Services.Areas.Notifications;
 
 public class NotificationService : INotificationService
 {
+    private readonly IConfiguration _configuration;
     private readonly MyRentalContext _context;
-    private static readonly MailAddress From = new("vladusupov2810@gmail.com", "MyRental");
+    private readonly MailAddress _from;
 
-    public NotificationService(MyRentalContext context)
+    public NotificationService(IConfiguration configuration, MyRentalContext context)
     {
+        _configuration = configuration;
         _context = context;
+
+        _from = new MailAddress(_configuration["NetworkCredential:UserName"], "MyRental");
     }
 
     public async Task<IList<string>> GetListAsync()
@@ -33,7 +38,7 @@ public class NotificationService : INotificationService
         
         var message = new MailMessage
         {
-            From = From,
+            From = _from,
             Subject = letter.Title,
             Body = letter.Message
         };
@@ -52,7 +57,7 @@ public class NotificationService : INotificationService
 
         var message = new MailMessage
         {
-            From = From,
+            From = _from,
             Subject = "You successfully subscribed!",
             Body = "Thank you for subscribe to our newsletter."
         };
@@ -68,7 +73,7 @@ public class NotificationService : INotificationService
 
         var message = new MailMessage
         {
-            From = From,
+            From = _from,
             Subject = "You successfully Registered!",
             Body = "Thank you for registration."
         };
@@ -120,8 +125,8 @@ public class NotificationService : INotificationService
             UseDefaultCredentials = false,
             Credentials = new NetworkCredential
             {
-                UserName = "vladusupov2810@gmail.com",
-                Password = "mcgqcsljtuezklbx"
+                UserName = _configuration["NetworkCredential:UserName"],
+                Password = _configuration["NetworkCredential:Password"]
             }
         };
     }
